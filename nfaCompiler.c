@@ -48,6 +48,7 @@ static int concatenateNfas(grrNfa nfa1, grrNfa nfa2);
 static int addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2);
 static int checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
 static int resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
+static int resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa);
 
 int grrCompile(const char *string, size_t len, grrNfa *nfa) {
     int ret;
@@ -67,12 +68,9 @@ int grrCompile(const char *string, size_t len, grrNfa *nfa) {
     }
 
     for (size_t idx=0; idx<len; idx++) {
-        size_t idx2;
         ssize_t stackIdx;
         char character;
-        int negation;
         grrNfa temp;
-        nfaTransition transition;
 
         character=string[idx];
         switch ( character ) {
@@ -138,135 +136,10 @@ int grrCompile(const char *string, size_t len, grrNfa *nfa) {
             break;
 
             case '[':
-            if ( idx == len-1 ) {
-                fprintf(stderr,"Unclosed character class:\n");
-                printIdxForString(string,len,idx);
-                ret=GRR_RET_BAD_DATA;
-                goto error;
-            }
-            memset(&transition,0,sizeof(transition));
-            idx2=idx;
-            if ( string[idx+1] == '^' ) {
-                negation=1;
-                idx += 2;
-            }
-            else {
-                negation=0;
-                idx++;
-            }
-            if ( idx < len && string[idx] == '-' ) {
-                setSymbol(&transition,'-');
-                idx++;
-            }
-            while ( idx < len-1 && string[idx] != ']' ) {
-                character=string[idx];
-
-                if ( string[idx+1] == '-' ) {
-                    char possibleRangeEnd, character2;
-
-                    if ( idx == len-2 ) {
-                        fprintf(stderr,"Unclosed range in character class:\n");
-                        printIdxForString(string,len,idx);
-                        ret=GRR_RET_BAD_DATA;
-                        goto error;
-                    }
-
-                    if ( character >= 'A' && character < 'Z' ) {
-                        possibleRangeEnd='Z';
-                    }
-                    else if ( character >= 'a' && character < 'z' ) {
-                        possibleRangeEnd='z';
-                    }
-                    else if ( character >= '0' && character < '9' ) {
-                        possibleRangeEnd='9';
-                    }
-                    else {
-                        fprintf(stderr,"Invalid character class range:\n");
-                        printIdxForString(string,len,idx);
-                        ret=GRR_RET_BAD_DATA;
-                        goto error;
-                    }
-
-                    character2=string[idx+2];
-                    if ( ! ( character2 > character && character2 <= possibleRangeEnd ) ) {
-                        fprintf(stderr,"Invalid character class range:\n");
-                        printIdxForString(string,len,idx);
-                        ret=GRR_RET_BAD_DATA;
-                        goto error;
-                    }
-
-                    for (char c=character; c<=character2; c++) {
-                        setSymbol(&transition,c);
-                    }
-
-                    idx+=3;
-                    continue;
-                }
-
-                if ( character == '\\' ) {
-                    character=string[idx+1];
-
-                    switch ( character ) {
-                        case '[':
-                        case ']':
-                        break;
-
-                        case 't':
-                        character='\t';
-                        break;
-
-                        default:
-                        fprintf(stderr,"Invalid character escape:\n");
-                        printIdxForString(string,len,idx);
-                        ret=GRR_RET_BAD_DATA;
-                        goto error;
-                    }
-
-                    idx+=2;
-                }
-                else {
-                    idx++;
-                }
-
-                setSymbol(&transition,character);
-            }
-
-            if ( idx >= len || string[idx] != ']' ) {
-                fprintf(stderr,"Unclosed character class:\n");
-                printIdxForString(string,len,idx2);
-                ret=GRR_RET_BAD_DATA;
-                goto error;
-            }
-
-            if ( negation ) {
-                for (size_t k=0; k<sizeof(transition.symbols); k++) {
-                    transition.symbols[k] ^= 0xff;
-                }
-                transition.symbols[0] &= ~GRR_NFA_EMPTY_TRANSITION_FLAG;
-            }
-
-            transition.motion=1;
-
-            temp=NEW_NFA();
-            if ( !temp ) {
-                ret=GRR_RET_OUT_OF_MEMORY;
-                goto error;
-            }
-            temp->nodes=calloc(1,sizeof(*(temp->nodes)));
-            if ( !temp->nodes ) {
-                grrFreeNfa(temp);
-                ret=GRR_RET_OUT_OF_MEMORY;
-                goto error;
-            }
-            memcpy(&temp->nodes[0].transitions[0],&transition,sizeof(transition));
-            temp->length=1;
-
-            ret=checkForQuantifier(temp,string,len,idx,&idx);
+            ret=resolveCharacterClass(string,len,&idx,&temp);
             if ( ret != GRR_RET_OK ) {
-                grrFreeNfa(temp);
                 goto error;
             }
-
             ret=concatenateNfas(current,temp);
             if ( ret != GRR_RET_OK ) {
                 grrFreeNfa(temp);
@@ -327,6 +200,57 @@ int grrCompile(const char *string, size_t len, grrNfa *nfa) {
             case '$':
             character=GRR_LAST_CHAR_CODE;
             goto add_character;
+
+            case '/':
+            if ( ++idx == len ) {
+                fprintf(stderr,"Expecting character class following '/':\n");
+                printIdxForString(string,len,idx-1);
+                ret=GRR_RET_BAD_DATA;
+                goto error;
+            }
+            if ( string[idx] == '[' ) {
+                ret=resolveCharacterClass(string,len,&idx,&temp);
+                if ( ret != GRR_RET_OK ) {
+                    goto error;
+                }
+            }
+            else if ( string[idx] == '\\' ) {
+                character=resolveEscapeCharacter(string[++idx]);
+                if ( character == GRR_INVALID_CHARACTER ) {
+                    fprintf(stderr,"Invalid character escape:\n");
+                    printIdxForString(string,len,idx);
+                    ret=GRR_RET_BAD_DATA;
+                    goto error;
+                }
+                temp=createCharacterNfa(character);
+                if ( !temp ) {
+                    ret=GRR_RET_OUT_OF_MEMORY;
+                    goto error;
+                }
+            }
+            else {
+                temp=createCharacterNfa(string[idx]);
+                if ( !temp ) {
+                    ret=GRR_RET_OUT_OF_MEMORY;
+                    goto error;
+                }
+            }
+            temp->nodes[0].transitions[0].symbols[0] |= GRR_NFA_BAR_FLAG;
+
+            if ( idx != len-1 ) {
+                fprintf(stderr,"Unexpected text following ending bar:\n");
+                printIdxForString(string,len,idx+1);
+                grrFreeNfa(temp);
+                ret=GRR_RET_BAD_DATA;
+                goto error;
+            }
+
+            ret=concatenateNfas(current,temp);
+            if ( ret != GRR_RET_OK ) {
+                grrFreeNfa(temp);
+                goto error;
+            }
+            break;
 
             default:
             add_character:
@@ -455,6 +379,7 @@ static char resolveEscapeCharacter(char c) {
         break;
 
         case '\\':
+        case '/':
         case '(':
         case ')':
         case '[':
@@ -493,8 +418,11 @@ static grrNfa createCharacterNfa(char c) {
 
     nodes->transitions[0].motion=1;
     setSymbol(&nodes->transitions[0],c);
-    if ( c == GRR_NFA_FIRST_CHAR_FLAG || c == GRR_NFA_LAST_CHAR_FLAG ) {
+    if ( c == GRR_NFA_FIRST_CHAR_FLAG ) {
         setSymbol(&nodes->transitions[0],GRR_NFA_EMPTY_TRANSITION_FLAG);
+    }
+    else if ( c == GRR_NFA_LAST_CHAR_FLAG ) {
+        nodes->transitions[0].motion=0;
     }
 
     nfa=NEW_NFA();
@@ -753,4 +681,150 @@ static int resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx,
     nfa->length*=value;
 
     return GRR_RET_OK;
+}
+
+static int resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa) {
+    int ret;
+    size_t idx2;
+    bool negation;
+    nfaNode *node;
+
+    if ( *idx == len-1 ) {
+        fprintf(stderr,"Unclosed character class:\n");
+        printIdxForString(string,len,*idx);
+        return GRR_RET_BAD_DATA;
+    }
+
+    node=calloc(1,sizeof(*node));
+    if ( !node ) {
+        return GRR_RET_OUT_OF_MEMORY;
+    }
+
+    idx2=*idx;
+    if ( string[*idx+1] == '^' ) {
+        negation=true;
+        *idx += 2;
+    }
+    else {
+        negation=false;
+        (*idx)++;
+    }
+    if ( *idx < len && string[*idx] == '-' ) {
+        setSymbol(&node->transitions[0],'-');
+        (*idx)++;
+    }
+    while ( *idx < len-1 && string[*idx] != ']' ) {
+        char character;
+
+        character=string[*idx];
+
+        if ( string[*idx+1] == '-' ) {
+            char possibleRangeEnd, character2;
+
+            if ( *idx == len-2 ) {
+                fprintf(stderr,"Unclosed range in character class:\n");
+                printIdxForString(string,len,*idx);
+                ret=GRR_RET_BAD_DATA;
+                goto error;
+            }
+
+            if ( character >= 'A' && character < 'Z' ) {
+                possibleRangeEnd='Z';
+            }
+            else if ( character >= 'a' && character < 'z' ) {
+                possibleRangeEnd='z';
+            }
+            else if ( character >= '0' && character < '9' ) {
+                possibleRangeEnd='9';
+            }
+            else {
+                fprintf(stderr,"Invalid character class range:\n");
+                printIdxForString(string,len,*idx);
+                ret=GRR_RET_BAD_DATA;
+                goto error;
+            }
+
+            character2=string[*idx+2];
+            if ( ! ( character2 > character && character2 <= possibleRangeEnd ) ) {
+                fprintf(stderr,"Invalid character class range:\n");
+                printIdxForString(string,len,*idx);
+                ret=GRR_RET_BAD_DATA;
+                goto error;
+            }
+
+            for (char c=character; c<=character2; c++) {
+                setSymbol(&node->transitions[0],c);
+            }
+
+            *idx+=3;
+            continue;
+        }
+
+        if ( character == '\\' ) {
+            character=string[*idx+1];
+
+            switch ( character ) {
+                case '[':
+                case ']':
+                break;
+
+                case 't':
+                character='\t';
+                break;
+
+                default:
+                fprintf(stderr,"Invalid character escape:\n");
+                printIdxForString(string,len,*idx);
+                ret=GRR_RET_BAD_DATA;
+                goto error;
+            }
+
+            *idx+=2;
+        }
+        else {
+            (*idx)++;
+        }
+
+        setSymbol(&node->transitions[0],character);
+    }
+
+    if ( *idx >= len || string[*idx] != ']' ) {
+        fprintf(stderr,"Unclosed character class:\n");
+        printIdxForString(string,len,idx2);
+        ret=GRR_RET_BAD_DATA;
+        goto error;
+    }
+
+    if ( negation ) {
+        for (size_t k=0; k<sizeof(node->transitions[0].symbols); k++) {
+            node->transitions[0].symbols[k] ^= 0xff;
+        }
+        node->transitions[0].symbols[0] &= ~GRR_NFA_EMPTY_TRANSITION_FLAG;
+        node->transitions[0].symbols[0] &= ~GRR_NFA_FIRST_CHAR_FLAG;
+        node->transitions[0].symbols[0] &= ~GRR_NFA_LAST_CHAR_FLAG;
+        node->transitions[0].symbols[0] &= ~GRR_NFA_BAR_FLAG;
+    }
+
+    node->transitions[0].motion=1;
+
+    *nfa=NEW_NFA();
+    if ( !*nfa ) {
+        ret=GRR_RET_OUT_OF_MEMORY;
+        goto error;
+    }
+    (*nfa)->nodes=node;
+    (*nfa)->length=1;
+
+    ret=checkForQuantifier(*nfa,string,len,*idx,idx);
+    if ( ret != GRR_RET_OK ) {
+        grrFreeNfa(*nfa);
+        return ret;
+    }
+
+    return GRR_RET_OK;
+
+    error:
+
+    free(node);
+    return ret;
 }
