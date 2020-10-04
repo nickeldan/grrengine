@@ -13,14 +13,13 @@
 /**
  *  \brief          Compiles a string into a regex object.
  *
- *  \param string   The string to be compiled (does not have to be
- *                  zero-terminated).
+ *  \param string   The string to be compiled (does not have to be null-terminated).
  *  \param len      The length of the string.
  *  \param nfa      A pointer to the Grr regex object to be populated.
  *  \return         GRR_RET_OK if successful.
- *                  GRR_RET_BAD_DATA if the string contained non-printable
- *                  characters.
+ *                  GRR_RET_BAD_DATA if the string contained non-printable characters.
  */
-int grrCompile(const char *string, size_t len, grrNfa *nfa);
+int
+grrCompile(const char *string, size_t len, grrNfa *nfa);
 
 #endif // __GRR_COMPILER_H__

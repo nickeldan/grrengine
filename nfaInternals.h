@@ -34,8 +34,8 @@ typedef struct nfaNode {
 } nfaNode;
 
 typedef struct nfaStateRecord {
-    size_t startIdx;
-    size_t endIdx;
+    size_t start_idx;
+    size_t end_idx;
     size_t score;
     unsigned int state;
 } nfaStateRecord;

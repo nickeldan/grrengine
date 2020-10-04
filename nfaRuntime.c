@@ -11,20 +11,30 @@ Written by Daniel Walker, 2020.
 #include "nfaRuntime.h"
 #include "nfaInternals.h"
 
-static bool determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, char character);
-static bool canTransitionToAcceptingState(const grrNfa nfa, unsigned int state);
-static void determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord *record, char character, unsigned char flags);
-static void maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score);
+static bool
+determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, char character);
 
-int grrMatch(const grrNfa nfa, const char *string, size_t len) {
-    unsigned int stateSetLen;
+static bool
+canTransitionToAcceptingState(const grrNfa nfa, unsigned int state);
 
-    stateSetLen=(nfa->length+1+7)/8; // The +1 is for the accepting state.
-    memset(nfa->current.s_flags,0,stateSetLen);
+static void
+determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord *record,
+                         char character, unsigned char flags);
+
+static void
+maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score);
+
+int
+grrMatch(const grrNfa nfa, const char *string, size_t len)
+{
+    unsigned int state_set_len;
+
+    state_set_len=(nfa->length+1+7)/8; // The +1 is for the accepting state.
+    memset(nfa->current.s_flags,0,state_set_len);
     SET_FLAG(nfa->current.s_flags,0);
 
     for (size_t idx=0; idx<len; idx++) {
-        bool stillAlive=false;
+        bool still_alive=false;
         char character;
 
         character=string[idx];
@@ -33,7 +43,7 @@ int grrMatch(const grrNfa nfa, const char *string, size_t len) {
         }
 
         character=ADJUST_CHARACTER(character);
-        memset(nfa->next.s_flags,0,stateSetLen);
+        memset(nfa->next.s_flags,0,state_set_len);
 
         for (unsigned int state=0; state<nfa->length; state++) {
             if ( !IS_FLAG_SET(nfa->current.s_flags,state) ) {
@@ -41,15 +51,15 @@ int grrMatch(const grrNfa nfa, const char *string, size_t len) {
             }
 
             if ( determineNextState(0,nfa,state,character) ) {
-                stillAlive=true;
+                still_alive=true;
             }
         }
 
-        if ( !stillAlive ) {
+        if ( !still_alive ) {
             return GRR_RET_NOT_FOUND;
         }
 
-        memcpy(nfa->current.s_flags,nfa->next.s_flags,stateSetLen);
+        memcpy(nfa->current.s_flags,nfa->next.s_flags,state_set_len);
     }
 
     for (unsigned int k=0; k<nfa->length; k++) {
@@ -61,7 +71,10 @@ int grrMatch(const grrNfa nfa, const char *string, size_t len) {
     return GRR_RET_NOT_FOUND;
 }
 
-int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end, size_t *cursor, bool tolerateNonprintables) {
+int
+grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end, size_t *cursor,
+          bool tolerant)
+{
     unsigned int length;
 
     length=nfa->length;
@@ -74,8 +87,8 @@ int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t 
     for (size_t idx=0; idx<len; idx++) {
         char character;
         unsigned char flags=0;
-        unsigned int currentLength;
-        nfaStateRecord firstState;
+        unsigned int current_length;
+        nfaStateRecord first_state;
 
         character=string[idx];
 
@@ -88,10 +101,10 @@ int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t 
         }
 
         nfa->next.length=0;
-        currentLength=nfa->current.length;
+        current_length=nfa->current.length;
 
         if ( !isprint(character) && character != '\t' ) {
-            if ( !tolerateNonprintables ) {
+            if ( !tolerant ) {
                 if ( cursor ) {
                     *cursor=idx;
                 }
@@ -99,12 +112,13 @@ int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t 
                 return GRR_RET_BAD_DATA;
             }
 
-            for (unsigned int k=0; k<currentLength; k++) {
+            for (unsigned int k=0; k<current_length; k++) {
                 if ( nfa->current.s_records[k].state == length ) {
                     if ( k > 0 ) {
-                        memcpy(nfa->current.s_records+0,nfa->current.s_records+k,sizeof(nfa->current.s_records[0]));
+                        memcpy(nfa->current.s_records+0,nfa->current.s_records+k,
+                            sizeof(nfa->current.s_records[0]));
                     }
-                    currentLength=nfa->current.length=1;
+                    current_length=nfa->current.length=1;
                     goto skip_over_clear;
                 }
             }
@@ -132,15 +146,16 @@ int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t 
 
         character=ADJUST_CHARACTER(character);
 
-        for (unsigned int k=0; k<currentLength; k++) {
-            determineNextStateRecord(0,nfa,nfa->current.s_records[k].state,nfa->current.s_records+k,character,flags);
+        for (unsigned int k=0; k<current_length; k++) {
+            determineNextStateRecord(0,nfa,nfa->current.s_records[k].state,nfa->current.s_records+k,
+                character,flags);
         }
 
-        firstState.state=0;
-        firstState.startIdx=firstState.endIdx=idx;
-        firstState.score=0;
+        first_state.state=0;
+        first_state.start_idx=first_state.end_idx=idx;
+        first_state.score=0;
 
-        determineNextStateRecord(0,nfa,0,&firstState,character,flags);
+        determineNextStateRecord(0,nfa,0,&first_state,character,flags);
 
         memcpy(nfa->current.s_records,nfa->next.s_records,nfa->next.length*sizeof(*nfa->next.s_records));
         nfa->current.length=nfa->next.length;
@@ -149,10 +164,10 @@ int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t 
     for (unsigned int k=0; k<nfa->current.length; k++) {
         if ( nfa->current.s_records[k].state == length ) {
             if ( start ) {
-                *start=nfa->current.s_records[k].startIdx;
+                *start=nfa->current.s_records[k].start_idx;
             }
             if ( end ) {
-                *end=nfa->current.s_records[k].endIdx;
+                *end=nfa->current.s_records[k].end_idx;
             }
 
             return GRR_RET_OK;
@@ -162,11 +177,14 @@ int grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t 
     return GRR_RET_NOT_FOUND;
 }
 
-static bool determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, char character) {
+static bool
+determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, char character)
+{
     const nfaNode *nodes;
-    bool stillAlive=false;
+    bool still_alive=false;
 
-    if ( state == nfa->length ) { // We've reached the accepting state but we have another character to process.
+    if ( state == nfa->length ) {
+        // We've reached the accepting state but we have another character to process.
         return false;
     }
 
@@ -174,25 +192,30 @@ static bool determineNextState(unsigned int depth, const grrNfa nfa, unsigned in
 
     nodes=nfa->nodes;
     for (unsigned int k=0; k<=nodes[state].twoTransitions; k++) {
-        unsigned int newState;
+        unsigned int new_state;
 
-        newState=state+nodes[state].transitions[k].motion;
+        new_state=state+nodes[state].transitions[k].motion;
 
         if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,character) ) {
-            SET_FLAG(nfa->next.s_flags,newState);
-            stillAlive=true;
+            SET_FLAG(nfa->next.s_flags,new_state);
+            still_alive=true;
         }
         else if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_EMPTY_TRANSITION) ) {
-            if ( determineNextState(depth+1,nfa,newState,character) ) {
-                stillAlive=true;
+            if ( determineNextState(depth+1,nfa,new_state,character) ) {
+                still_alive=true;
             }
+        }
+        else if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_BAR) ) {
+            return false;
         }
     }
 
-    return stillAlive;
+    return still_alive;
 }
 
-static bool canTransitionToAcceptingState(const grrNfa nfa, unsigned int state) {
+static bool
+canTransitionToAcceptingState(const grrNfa nfa, unsigned int state) 
+{
     const nfaNode *nodes;
 
     if ( state == nfa->length ) {
@@ -201,11 +224,12 @@ static bool canTransitionToAcceptingState(const grrNfa nfa, unsigned int state) 
 
     nodes=nfa->nodes;
     for (unsigned int k=0; k<=nodes[state].twoTransitions; k++) {
-        if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_EMPTY_TRANSITION) ) {
-            unsigned int newState;
+        if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_EMPTY_TRANSITION)
+                || IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_BAR) ) {
+            unsigned int new_state;
 
-            newState=state+nodes[state].transitions[k].motion;
-            if ( canTransitionToAcceptingState(nfa,newState) ) {
+            new_state=state+nodes[state].transitions[k].motion;
+            if ( canTransitionToAcceptingState(nfa,new_state) ) {
                 return true;
             }
         }
@@ -214,7 +238,10 @@ static bool canTransitionToAcceptingState(const grrNfa nfa, unsigned int state) 
     return false;
 }
 
-static void determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord *record, char character, unsigned char flags) {
+static void
+determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord *record,
+                         char character, unsigned char flags)
+{
     const nfaNode *nodes;
 
     if ( state == nfa->length ) {
@@ -226,14 +253,21 @@ static void determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned in
 
     nodes=nfa->nodes;
     for (unsigned int k=0; k<=nodes[state].twoTransitions; k++) {
-        unsigned int newState;
+        unsigned int new_state;
         const unsigned char *symbols;
 
-        newState=state+nodes[state].transitions[k].motion;
+        new_state=state+nodes[state].transitions[k].motion;
 
         symbols=nodes[state].transitions[k].symbols;
-        if ( IS_FLAG_SET(symbols,character) ) {
-            maybePlaceRecord(record,newState,&nfa->next,true);
+        if ( IS_FLAG_SET(symbols,GRR_NFA_BAR) ) {
+            if ( IS_FLAG_SET(symbols,character) ) {
+                continue;
+            }
+
+            maybePlaceRecord(record,new_state,&nfa->next,false);
+        }
+        else if ( IS_FLAG_SET(symbols,character) ) {
+            maybePlaceRecord(record,new_state,&nfa->next,true);
         }
         else if ( IS_FLAG_SET(symbols,GRR_NFA_EMPTY_TRANSITION) ) {
             if ( IS_FLAG_SET(symbols,GRR_NFA_FIRST_CHAR) && !(flags&GRR_NFA_FIRST_CHAR_FLAG) ) {
@@ -244,14 +278,16 @@ static void determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned in
                 continue;
             }
 
-            determineNextStateRecord(depth+1,nfa,newState,record,character,flags);
+            determineNextStateRecord(depth+1,nfa,new_state,record,character,flags);
         }
     }
 }
 
-static void maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score) {
+static void
+maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score)
+{
     unsigned int k;
-    size_t newScore;
+    size_t new_score;
 
     for (k=0; k<set->length; k++) {
         if ( set->s_records[k].state == state ) {
@@ -259,13 +295,13 @@ static void maybePlaceRecord(const nfaStateRecord *record, unsigned int state, n
         }
     }
 
-    newScore=record->score+(update_score? 1 : 0);
-    if ( k == set->length || newScore > set->s_records[k].score ) {
-        set->s_records[k].startIdx=record->startIdx;
-        set->s_records[k].endIdx=record->endIdx;
-        set->s_records[k].score=newScore;
+    new_score=record->score+(update_score? 1 : 0);
+    if ( k == set->length || new_score > set->s_records[k].score ) {
+        set->s_records[k].start_idx=record->start_idx;
+        set->s_records[k].end_idx=record->end_idx;
+        set->s_records[k].score=new_score;
         if ( update_score ) {
-            set->s_records[k].endIdx++;
+            set->s_records[k].end_idx++;
         }
 
         if ( k == set->length ) {

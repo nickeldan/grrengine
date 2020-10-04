@@ -1,0 +1,5 @@
+matchTest
+searchTest
+*.o
+*.so
+*.a

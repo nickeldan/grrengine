@@ -37,20 +37,45 @@ typedef struct nfaStack {
 
 #define NEW_NFA() calloc(1,sizeof(struct grrNfaStruct))
 
-static void printIdxForString(const char *string, size_t len, size_t idx);
-static int pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason);
-static void freeNfaStack(nfaStack *stack);
-static ssize_t findParensInStack(const nfaStack *stack);
-static char resolveEscapeCharacter(char c) __attribute__ ((pure));
-static grrNfa createCharacterNfa(char c);
-static void setSymbol(nfaTransition *transition, char c);
-static int concatenateNfas(grrNfa nfa1, grrNfa nfa2);
-static int addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2);
-static int checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
-static int resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
-static int resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa);
+static void
+printIdxForString(const char *string, size_t len, size_t idx);
 
-int grrCompile(const char *string, size_t len, grrNfa *nfa) {
+static int
+pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason);
+
+static void
+freeNfaStack(nfaStack *stack);
+
+static ssize_t
+findParensInStack(const nfaStack *stack);
+
+static char
+resolveEscapeCharacter(char c) __attribute__ ((pure));
+
+static grrNfa
+createCharacterNfa(char c);
+
+static void
+setSymbol(nfaTransition *transition, char c);
+
+static int
+concatenateNfas(grrNfa nfa1, grrNfa nfa2);
+
+static int
+addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2);
+
+static int
+checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
+
+static int
+resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
+
+static int
+resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa);
+
+int
+grrCompile(const char *string, size_t len, grrNfa *nfa)
+{
     int ret;
     nfaStack stack={0};
     grrNfa current;
@@ -96,7 +121,7 @@ int grrCompile(const char *string, size_t len, grrNfa *nfa) {
                 goto error;
             }
 
-            if ( stackIdx == stack.length-1 ) { // The parentheses were empty.
+            if ( (size_t)stackIdx == stack.length-1 ) { // The parentheses were empty.
                 grrFreeNfa(current);
             }
             else {
@@ -208,6 +233,7 @@ int grrCompile(const char *string, size_t len, grrNfa *nfa) {
                 ret=GRR_RET_BAD_DATA;
                 goto error;
             }
+
             if ( string[idx] == '[' ) {
                 ret=resolveCharacterClass(string,len,&idx,&temp);
                 if ( ret != GRR_RET_OK ) {
@@ -321,7 +347,9 @@ int grrCompile(const char *string, size_t len, grrNfa *nfa) {
     return ret;
 }
 
-static void printIdxForString(const char *string, size_t len, size_t idx) {
+static void
+printIdxForString(const char *string, size_t len, size_t idx)
+{
     fprintf(stderr,"\t%.*s\n\t", (int)len, string);
     for (size_t k=0; k<idx; k++) {
         fprintf(stderr," ");
@@ -329,7 +357,9 @@ static void printIdxForString(const char *string, size_t len, size_t idx) {
     fprintf(stderr,"^\n");
 }
 
-static int pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason) {
+static int
+pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason)
+{
     if ( stack->length == stack->capacity ) {
         nfaStackFrame *success;
         size_t newCapacity;
@@ -352,7 +382,9 @@ static int pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason) 
     return GRR_RET_OK;
 }
 
-static void freeNfaStack(nfaStack *stack) {
+static void
+freeNfaStack(nfaStack *stack)
+{
     size_t len;
 
     len=stack->length;
@@ -362,7 +394,9 @@ static void freeNfaStack(nfaStack *stack) {
     }
 }
 
-static ssize_t findParensInStack(const nfaStack *stack) {
+static ssize_t
+findParensInStack(const nfaStack *stack)
+{
     for (ssize_t idx=(ssize_t)stack->length-1; idx>=0; idx--) {
         if ( stack->frames[idx].nfa && stack->frames[idx].reason == '(' ) {
             return idx;
@@ -372,7 +406,9 @@ static ssize_t findParensInStack(const nfaStack *stack) {
     return -1;
 }
 
-static char resolveEscapeCharacter(char c) {
+static char
+resolveEscapeCharacter(char c)
+{
     switch ( c ) {
         case 't':
         return '\t';
@@ -407,7 +443,9 @@ static char resolveEscapeCharacter(char c) {
     }
 }
 
-static grrNfa createCharacterNfa(char c) {
+static grrNfa
+createCharacterNfa(char c)
+{
     grrNfa nfa;
     nfaNode *nodes;
 
@@ -418,11 +456,8 @@ static grrNfa createCharacterNfa(char c) {
 
     nodes->transitions[0].motion=1;
     setSymbol(&nodes->transitions[0],c);
-    if ( c == GRR_NFA_FIRST_CHAR_FLAG ) {
-        setSymbol(&nodes->transitions[0],GRR_NFA_EMPTY_TRANSITION_FLAG);
-    }
-    else if ( c == GRR_NFA_LAST_CHAR_FLAG ) {
-        nodes->transitions[0].motion=0;
+    if ( c == GRR_FIRST_CHAR_CODE || c == GRR_LAST_CHAR_CODE ) {
+        setSymbol(&nodes->transitions[0],GRR_EMPTY_TRANSITION_CODE);
     }
 
     nfa=NEW_NFA();
@@ -437,7 +472,9 @@ static grrNfa createCharacterNfa(char c) {
     return nfa;
 }
 
-static void setSymbol(nfaTransition *transition, char c) {
+static void
+setSymbol(nfaTransition *transition, char c)
+{
     char c2;
 
     switch ( c ) {
@@ -482,7 +519,9 @@ static void setSymbol(nfaTransition *transition, char c) {
     }
 }
 
-static int concatenateNfas(grrNfa nfa1, grrNfa nfa2) {
+static int
+concatenateNfas(grrNfa nfa1, grrNfa nfa2)
+{
     size_t newLen;
     nfaNode *success;
 
@@ -501,7 +540,9 @@ static int concatenateNfas(grrNfa nfa1, grrNfa nfa2) {
     return GRR_RET_OK;
 }
 
-static int addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2) {
+static int
+addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2)
+{
     unsigned int newLen, len1, len2;
     nfaNode *success;
 
@@ -528,7 +569,7 @@ static int addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2) {
 
     for (unsigned int k=0; k<len1; k++) {
         for (unsigned int j=0; j<=success[k+1].twoTransitions; j++) {
-            if ( (int)k + success[k+1].transitions[j].motion == len1 ) {
+            if ( k + (unsigned int)success[k+1].transitions[j].motion == len1 ) {
                 success[k+1].transitions[j].motion += len2;
             }
         }
@@ -538,7 +579,9 @@ static int addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2) {
     return GRR_RET_OK;
 }
 
-static int checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx) {
+static int
+checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx)
+{
     bool question=false, plus=false;
 
     if ( idx+1 == len ) {
@@ -626,10 +669,12 @@ static int checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t
     return GRR_RET_OK;
 }
 
-static int resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx) {
+static int
+resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx)
+{
     size_t end, numNodes;
     long value;
-    char *buffer;
+    char *buffer, *temp;
     nfaNode *success;
 
     for (end=idx+1; end<len && string[end] != '}'; end++) {
@@ -657,8 +702,9 @@ static int resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx,
     memcpy(buffer,string+idx+1,end-1-idx);
     buffer[end-idx]='\0';
 
-    value=strtol(buffer,NULL,10);
-    if ( value == LONG_MAX && errno == ERANGE ) {
+    errno=0;
+    value=strtol(buffer,&temp,10);
+    if ( errno != 0 || temp == buffer || temp[0] != '\0' ) {
         fprintf(stderr,"Invalid quantifier inside braces:\n");
         printIdxForString(string,len,idx+1);
         return GRR_RET_BAD_DATA;
@@ -683,7 +729,9 @@ static int resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx,
     return GRR_RET_OK;
 }
 
-static int resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa) {
+static int
+resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa)
+{
     int ret;
     size_t idx2;
     bool negation;
