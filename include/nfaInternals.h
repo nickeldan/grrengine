@@ -33,28 +33,9 @@ typedef struct nfaNode {
     unsigned char two_transitions;
 } nfaNode;
 
-typedef struct nfaStateRecord {
-    size_t start_idx;
-    size_t end_idx;
-    size_t score;
-    unsigned int state;
-} nfaStateRecord;
-
-typedef struct nfaStateSet {
-    union {
-        nfaStateRecord *records;
-        unsigned char *flags;
-    } set;
-    unsigned int length;
-} nfaStateSet;
-#define s_records set.records
-#define s_flags set.flags
-
 struct grrNfaStruct {
     nfaNode *nodes;
     char *string;
-    nfaStateSet current;
-    nfaStateSet next;
     unsigned int length;
 };
 
