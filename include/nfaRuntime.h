@@ -71,7 +71,7 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
  *                      is encountered, it will not be store but will be put back in the stream to be read
  *                      later.
  * \param capacity      The size of the destination buffer.
- * \param size          *size will hold will number of characters stored in destination.
+ * \param size          Pointer to where the number of characters stored in destination will be stored.
  * \return              The index of the regex with the longest match of the input or -1 if either no such
  *                      match was found or either nfa_list, file, destination, or size is NULL.
  */

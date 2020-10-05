@@ -13,7 +13,7 @@
 /**
  * \brief           Frees a regex object.
  *
- * \note            Returns immediately if nfa is NULL
+ * \note            Returns immediately if nfa is NULL.
  *
  * \param nfa       A Grr regex object.
  */

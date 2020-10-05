@@ -1,3 +1,4 @@
+CC ?= gcc
 debug ?= no
 
 LIB_NAME := libgrrengine
@@ -13,7 +14,7 @@ $(LIB_NAME).a: source/$(LIB_NAME).a
 	cp $< $@
 
 source/%: FORCE
-	cd source && make $(notdir $@) debug=$(debug)
+	cd source && make $(notdir $@) CC=$(CC) debug=$(debug)
 
 clean:
 	rm -f $(LIB_NAME).so $(LIB_NAME).a
