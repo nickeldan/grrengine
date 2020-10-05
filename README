@@ -2,3 +2,16 @@ GrrEngine was written by Daniel Walker.
 Version ??? was released on ???.
 
 All access to the API is acquired by including nfa.h.  See the documentation for further details.
+
+=== GRAMMAR ===
+
+The only special character classes implemented are \d (digits) and \s (spaces and tabs).
+
+Grr's regex engine does not support group capturing and so all text within parentheses are considered a
+non-capturing group.
+
+Braces (i.e., { and }) can only be used to specify an exact quantity.
+
+A barred lookahead character class can be added to a regex with a forward slash.  For example, if the regex
+is "a+/[0-9]", then, when calling grrSearch and grrFirstMatch, a string of "a"'s will not be considered a
+match if the following character is a digit.
