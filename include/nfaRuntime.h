@@ -31,11 +31,10 @@ grrMatch(const grrNfa nfa, const char *string, size_t len);
  * \brief            Determines if a string contains a substring which matches the regex.
  *
  * The function will stop processing characters when either it exhausts the specified length, a newline is
- * encountered, or a non-printable character is encountered with tolerateNonprintables set to false.  If
- * tolerateNonprintables is true, then the function will skip over such characters and treat them as
- * beginning and end of lines.  For example, if the regex is "^a+" and the string is "aa\x00aaad", then both
- * sequences of "a"'s will be considered matches.  However, they will be considered separate matches and so
- * *end-*start will be 3.
+ * encountered, or a non-printable character is encountered with tolerant set to false.  If tolerant is true,
+ * then the function will skip over such characters and treat them as beginning and end of lines.  For
+ * example, if the regex is "^a+" and the string is "aa\x00aaad", then both sequences of "a"'s will be
+ * considered matches.  However, they will be considered separate matches and so *end-*start will be 3.
  *
  * \param nfa       The Grr regex object.
  * \param string    The string (does not have to be null-terminated).
@@ -59,7 +58,7 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
           bool tolerant);
 
 /**
- * \brief               Returns the index of regex which matches most of the input from the file stream.
+ * \brief               Returns the index of regex which matches the most of the input from the file stream.
  *
  * Characters are read from the file stream and stored into destination until EOF is reached, capacity is
  * reached, or a non-printable character or newline is encountered.

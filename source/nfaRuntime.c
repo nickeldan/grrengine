@@ -201,6 +201,7 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
 
     for (*size=0; *size<capacity; (*size)++) {
         int character;
+        char adjusted;
         bool still_alive=false;
 
         character=destination[*size]=fgetc(file);
@@ -213,13 +214,13 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
             break;
         }
 
-        character=ADJUST_CHARACTER(character);
+        adjusted=ADJUST_CHARACTER(character);
         
         if ( *size == 0 ) {
             for (size_t k=0; k<num; k++) {
                 nfaStateRecord first_state={0};
 
-                determineNextStateRecord(0,nfa_list[k],0,&first_state,character,flags);
+                determineNextStateRecord(0,nfa_list[k],0,&first_state,adjusted,flags);
             }
         }
         else {
@@ -234,7 +235,7 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
 
                 for (unsigned int k=0; k<nfa->current.length; k++) {
                     determineNextStateRecord(0,nfa,nfa->current.s_records[k].state,nfa->current.s_records+k,
-                        character,flags);
+                        adjusted,flags);
                 }
             }
         }
@@ -247,12 +248,15 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
             if ( nfa->next.length > 0 ) {
                 memcpy(nfa->current.s_records,nfa->next.s_records,
                     nfa->next.length*sizeof(*nfa->next.s_records));
-                still_alive=true;
+                if ( nfa->next.length > 1 || nfa->next.s_records[0].state != nfa->length ) {
+                    still_alive=true;
+                }
             }
         }
 
         if ( !still_alive ) {
-            return -1;
+            ungetc(character,file);
+            break;
         }
     }
 
