@@ -30,7 +30,7 @@ typedef struct nfaTransition {
 
 typedef struct nfaNode {
     nfaTransition transitions[2];
-    unsigned char twoTransitions;
+    unsigned char two_transitions;
 } nfaNode;
 
 typedef struct nfaStateRecord {

@@ -80,6 +80,10 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
     nfaStack stack={0};
     grrNfa current;
 
+    if ( !string || len == 0 || !nfa ) {
+        return GRR_RET_BAD_ARGS;
+    }
+
     for (size_t idx=0; idx<len; idx++) {
         if ( !isprint(string[idx]) ) {
             fprintf(stderr,"Unprintable character at index %zu: 0x%02x\n", idx, (unsigned char)string[idx]);
@@ -560,7 +564,7 @@ addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2)
     nfa1->length=newLen;
 
     memset(success,0,sizeof(*success));
-    success[0].twoTransitions=1;
+    success[0].two_transitions=1;
     for (int k=0; k<2; k++) {
         setSymbol(&success[0].transitions[k],GRR_EMPTY_TRANSITION_CODE);
     }
@@ -568,7 +572,7 @@ addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2)
     success[0].transitions[1].motion=len1+1;
 
     for (unsigned int k=0; k<len1; k++) {
-        for (unsigned int j=0; j<=success[k+1].twoTransitions; j++) {
+        for (unsigned int j=0; j<=success[k+1].two_transitions; j++) {
             if ( k + (unsigned int)success[k+1].transitions[j].motion == len1 ) {
                 success[k+1].transitions[j].motion += len2;
             }
@@ -623,7 +627,7 @@ checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_
         nfa->nodes=success;
 
         memset(success+length,0,sizeof(*success));
-        success[length].twoTransitions=1;
+        success[length].two_transitions=1;
         for (int k=0; k<2; k++) {
             setSymbol(&success[length].transitions[k],GRR_EMPTY_TRANSITION_CODE);
         }
@@ -634,7 +638,7 @@ checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_
     }
 
     if ( question ) {
-        if ( nfa->nodes[0].twoTransitions ) {
+        if ( nfa->nodes[0].two_transitions ) {
             nfaNode *success;
 
             success=realloc(nfa->nodes,sizeof(*success)*(nfa->length+1));
@@ -645,7 +649,7 @@ checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_
 
             memmove(success+1,success,sizeof(*success)*nfa->length);
             memset(success,0,sizeof(*success));
-            success[0].twoTransitions=1;
+            success[0].two_transitions=1;
 
             for (int k=0; k<2; k++) {
                 setSymbol(&success[0].transitions[k],GRR_EMPTY_TRANSITION_CODE);
@@ -662,7 +666,7 @@ checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_
             memset(node->transitions[1].symbols,0,sizeof(nfa->nodes[0].transitions[1].symbols));
             setSymbol(&node->transitions[1],GRR_EMPTY_TRANSITION_CODE);
             node->transitions[1].motion=nfa->length;
-            node->twoTransitions=1;
+            node->two_transitions=1;
         }
     }
 

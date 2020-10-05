@@ -1,0 +1,4 @@
+GrrEngine was written by Daniel Walker.
+Version ??? was released on ???.
+
+All access to the API is acquired by including nfa.h.  See the documentation for further details.

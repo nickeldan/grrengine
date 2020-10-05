@@ -2,7 +2,6 @@
 Written by Daniel Walker, 2020.
 */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -28,6 +27,10 @@ int
 grrMatch(const grrNfa nfa, const char *string, size_t len)
 {
     unsigned int state_set_len;
+
+    if ( !nfa || !string ) {
+        return GRR_RET_BAD_ARGS;
+    }
 
     state_set_len=(nfa->length+1+7)/8; // The +1 is for the accepting state.
     memset(nfa->current.s_flags,0,state_set_len);
@@ -76,6 +79,10 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
           bool tolerant)
 {
     unsigned int length;
+
+    if ( !nfa || !string ) {
+        return GRR_RET_BAD_ARGS;
+    }
 
     length=nfa->length;
     nfa->current.length=0;
@@ -177,6 +184,97 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
     return GRR_RET_NOT_FOUND;
 }
 
+ssize_t
+grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_t capacity, size_t *size)
+{
+    unsigned char flags=GRR_NFA_FIRST_CHAR_FLAG|GRR_NFA_LAST_CHAR_FLAG;
+    size_t champion, champion_score;
+
+    if ( !nfa_list || !file || !destination || !size ) {
+        return -1;
+    }
+
+    for (size_t k=0; k<num; k++) {
+        nfa_list[k]->current.length=0;
+        nfa_list[k]->next.length=0;
+    }
+
+    for (*size=0; *size<capacity; (*size)++) {
+        int character;
+        bool still_alive=false;
+
+        character=destination[*size]=fgetc(file);
+        if ( character == EOF ) {
+            break;
+        }
+
+        if ( !isprint(character) && character != '\t' ) {
+            ungetc(character,file);
+            break;
+        }
+
+        character=ADJUST_CHARACTER(character);
+        
+        if ( *size == 0 ) {
+            for (size_t k=0; k<num; k++) {
+                nfaStateRecord first_state={0};
+
+                determineNextStateRecord(0,nfa_list[k],0,&first_state,character,flags);
+            }
+        }
+        else {
+            for (size_t k=0; k<num; k++) {
+                grrNfa nfa;
+
+                nfa=nfa_list[k];
+                if ( nfa->current.length == 0 ) {
+                    continue;
+                }
+                nfa->next.length=0;
+
+                for (unsigned int k=0; k<nfa->current.length; k++) {
+                    determineNextStateRecord(0,nfa,nfa->current.s_records[k].state,nfa->current.s_records+k,
+                        character,flags);
+                }
+            }
+        }
+
+        for (size_t k=0; k<num; k++) {
+            grrNfa nfa;
+
+            nfa=nfa_list[k];
+
+            if ( nfa->next.length > 0 ) {
+                memcpy(nfa->current.s_records,nfa->next.s_records,
+                    nfa->next.length*sizeof(*nfa->next.s_records));
+                still_alive=true;
+            }
+        }
+
+        if ( !still_alive ) {
+            return -1;
+        }
+    }
+
+    champion_score=0;
+    for (size_t k=0; k<num; k++) {
+        grrNfa nfa;
+
+        nfa=nfa_list[k];
+
+        for (unsigned int j=0; j<nfa->current.length; j++) {
+            if ( nfa->current.s_records[j].state == nfa->length ) {
+                if ( nfa->current.s_records[j].score > champion_score ) {
+                    champion_score=nfa->current.s_records[j].score;
+                    champion=k;
+                }
+            }
+        }
+    }
+
+    return ( champion_score > 0 )? (ssize_t)champion : -1;
+}
+
 static bool
 determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, char character)
 {
@@ -191,7 +289,7 @@ determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, cha
     assert(depth < nfa->length);
 
     nodes=nfa->nodes;
-    for (unsigned int k=0; k<=nodes[state].twoTransitions; k++) {
+    for (unsigned int k=0; k<=nodes[state].two_transitions; k++) {
         unsigned int new_state;
 
         new_state=state+nodes[state].transitions[k].motion;
@@ -223,7 +321,7 @@ canTransitionToAcceptingState(const grrNfa nfa, unsigned int state)
     }
 
     nodes=nfa->nodes;
-    for (unsigned int k=0; k<=nodes[state].twoTransitions; k++) {
+    for (unsigned int k=0; k<=nodes[state].two_transitions; k++) {
         if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_EMPTY_TRANSITION)
                 || IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_BAR) ) {
             unsigned int new_state;
@@ -252,7 +350,7 @@ determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, con
     assert(depth < nfa->length);
 
     nodes=nfa->nodes;
-    for (unsigned int k=0; k<=nodes[state].twoTransitions; k++) {
+    for (unsigned int k=0; k<=nodes[state].two_transitions; k++) {
         unsigned int new_state;
         const unsigned char *symbols;
 
