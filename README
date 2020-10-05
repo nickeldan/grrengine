@@ -12,6 +12,6 @@ non-capturing group.
 
 Braces (i.e., { and }) can only be used to specify an exact quantity.
 
-A barred lookahead character class can be added to a regex with a forward slash.  For example, if the regex
-is "a+/[0-9]", then, when calling grrSearch and grrFirstMatch, a string of "a"'s will not be considered a
-match if the following character is a digit.
+A lookahead character class can be added to a regex with a forward slash.  For example, if the regex is
+"a+/[0-9]", then, when calling grrSearch and grrFirstMatch, a string of "a"'s will not be considered a match
+unless the following character is a digit.

@@ -265,7 +265,8 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
                     goto error;
                 }
             }
-            temp->nodes[0].transitions[0].symbols[0] |= GRR_NFA_BAR_FLAG;
+            temp->nodes[0].transitions[0].symbols[0] |= GRR_NFA_LOOKAHEAD_FLAG;
+            temp->nodes[0].transitions[0].symbols[0] &= ~GRR_NFA_EMPTY_TRANSITION_FLAG;
 
             if ( idx != len-1 ) {
                 fprintf(stderr,"Unexpected text following ending bar:\n");
@@ -851,10 +852,9 @@ resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa)
         for (size_t k=0; k<sizeof(node->transitions[0].symbols); k++) {
             node->transitions[0].symbols[k] ^= 0xff;
         }
-        node->transitions[0].symbols[0] &= ~GRR_NFA_EMPTY_TRANSITION_FLAG;
         node->transitions[0].symbols[0] &= ~GRR_NFA_FIRST_CHAR_FLAG;
         node->transitions[0].symbols[0] &= ~GRR_NFA_LAST_CHAR_FLAG;
-        node->transitions[0].symbols[0] &= ~GRR_NFA_BAR_FLAG;
+        node->transitions[0].symbols[0] &= ~GRR_NFA_LOOKAHEAD_FLAG;
     }
 
     node->transitions[0].motion=1;

@@ -307,7 +307,7 @@ determineNextState(unsigned int depth, const grrNfa nfa, unsigned int state, cha
                 still_alive=true;
             }
         }
-        else if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_BAR) ) {
+        else if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_LOOKAHEAD) ) {
             return false;
         }
     }
@@ -327,7 +327,7 @@ canTransitionToAcceptingState(const grrNfa nfa, unsigned int state)
     nodes=nfa->nodes;
     for (unsigned int k=0; k<=nodes[state].two_transitions; k++) {
         if ( IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_EMPTY_TRANSITION)
-                || IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_BAR) ) {
+                || IS_FLAG_SET(nodes[state].transitions[k].symbols,GRR_NFA_LOOKAHEAD) ) {
             unsigned int new_state;
 
             new_state=state+nodes[state].transitions[k].motion;
@@ -361,8 +361,8 @@ determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, con
         new_state=state+nodes[state].transitions[k].motion;
 
         symbols=nodes[state].transitions[k].symbols;
-        if ( IS_FLAG_SET(symbols,GRR_NFA_BAR) ) {
-            if ( IS_FLAG_SET(symbols,character) ) {
+        if ( IS_FLAG_SET(symbols,GRR_NFA_LOOKAHEAD) ) {
+            if ( !IS_FLAG_SET(symbols,character) ) {
                 continue;
             }
 
