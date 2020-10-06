@@ -67,7 +67,7 @@ grrMatch(const grrNfa nfa, const char *string, size_t len)
                 continue;
             }
 
-            if ( determineNextState(0,nfa,state,character,current_state_set) ) {
+            if ( determineNextState(0,nfa,state,character,next_state_set) ) {
                 still_alive=true;
             }
         }
