@@ -1,4 +1,6 @@
 2.0.0:
+    - grrMatch can no longer return GRR_RET_OUT_OF_MEMORY.
+    - grrMatch now ignores the ^ and $ regex special characters.
     - grrNfa objects no longer maintain their own scratch pads.  Instead, the scratch pads are allocated on
       the stack as needed.  This caused a small but noticeable speed-up in runtime.
     - A look-ahead character class can now added to the end of regexes.
