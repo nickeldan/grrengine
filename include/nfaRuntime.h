@@ -21,7 +21,6 @@
  * \param len       The length of the string.
  * \return          GRR_RET_OK if the string matched the regex.
  *                  GRR_RET_BAD_ARGS is either nfa or string is NULL.
- *                  GRR_RET_OUT_MEMORY if a memory allocation failed.
  *                  GRR_RET_BAD_DATA if the string contained a non-printable character.
  */
 int
