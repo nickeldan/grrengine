@@ -4,3 +4,4 @@
     - grrNfa objects no longer maintain their own scratch pads.  Instead, the scratch pads are allocated on
       the stack as needed.  This caused a small but noticeable speed-up in runtime.
     - A look-ahead character class can now added to the end of regexes.
+    - The grrFirstMatch function was added.
