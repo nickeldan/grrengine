@@ -3,8 +3,8 @@
  * \brief   Basic Grr definitions.
  */
 
-#ifndef __GRR_NFA_DEF_H__
-#define __GRR_NFA_DEF_H__
+#ifndef __GRR_ENGINE_NFA_DEF_H__
+#define __GRR_ENGINE_NFA_DEF_H__
 
 /**
  * \brief Function return values.
@@ -27,4 +27,4 @@ enum grrRetValue {
  */
 typedef struct grrNfaStruct *grrNfa;
 
-#endif // __GRR_NFA_DEF_H__
+#endif // __GRR_ENGINE_NFA_DEF_H__

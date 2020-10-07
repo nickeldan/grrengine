@@ -3,8 +3,8 @@
  * \brief   Compile regexes.
  */
 
-#ifndef __GRR_COMPILER_H__
-#define __GRR_COMPILER_H__
+#ifndef __GRR_ENGINE_COMPILER_H__
+#define __GRR_ENGINE_COMPILER_H__
 
 #include <sys/types.h>
 
@@ -23,4 +23,4 @@
 int
 grrCompile(const char *string, size_t len, grrNfa *nfa);
 
-#endif // __GRR_COMPILER_H__
+#endif // __GRR_ENGINE_COMPILER_H__

@@ -1,5 +1,5 @@
-#ifndef __GRR_NFA_INTERNALS_H__
-#define __GRR_NFA_INTERNALS_H__
+#ifndef __GRR_ENGINE_NFA_INTERNALS_H__
+#define __GRR_ENGINE_NFA_INTERNALS_H__
 
 #include "nfaDef.h"
 
@@ -42,4 +42,4 @@ struct grrNfaStruct {
 #define SET_FLAG(state,flag) (state)[(flag)/8] |= ( 1 << ((flag)%8) )
 #define IS_FLAG_SET(state,flag) ( (state)[(flag)/8]&( 1 << ((flag)%8) ) )
 
-#endif // __GRR_NFA_INTERNALS_H__
+#endif // __GRR_ENGINE_NFA_INTERNALS_H__

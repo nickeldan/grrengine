@@ -3,8 +3,8 @@
  * \brief   Grr interface portal.
  */
 
-#ifndef __GRR_NFA_H__
-#define __GRR_NFA_H__
+#ifndef __GRR_ENGINE_NFA_H__
+#define __GRR_ENGINE_NFA_H__
 
 #include "nfaDef.h"
 #include "nfaCompiler.h"
@@ -33,4 +33,4 @@ grrFreeNfa(grrNfa nfa);
 const char*
 grrDescription(const grrNfa nfa);
 
-#endif // __GRR_NFA_H__
+#endif // __GRR_ENGINE_NFA_H__

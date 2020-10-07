@@ -5,7 +5,6 @@ Written by Daniel Walker, 2020.
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <alloca.h>
 #include <assert.h>
 
 #include "nfaRuntime.h"
@@ -200,96 +199,6 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
     }
 
     return GRR_RET_NOT_FOUND;
-}
-
-ssize_t
-grrFirstMatch(grrNfa *nfa_list, size_t num, const char *source, size_t size, size_t *processed,
-              size_t *score)
-{
-    unsigned char flags=GRR_NFA_FIRST_CHAR_FLAG|GRR_NFA_LAST_CHAR_FLAG;
-    size_t champion;
-    nfaStateSet current_state_sets[num], next_state_sets[num];
-    
-    if ( !nfa_list || num == 0 || !source || size == 0 || !processed ) {
-        return -1;
-    }
-
-    for (size_t k=0; k<num; k++) {
-        current_state_sets[k].records=alloca(sizeof(nfaStateRecord)*(nfa_list[k]->length+1));
-        current_state_sets[k].length=0;
-
-        next_state_sets[k].records=alloca(sizeof(nfaStateRecord)*(nfa_list[k]->length+1));
-    }
-
-    for (*processed=0; *processed<size; (*processed)++) {
-        char character;
-        bool still_alive=false;
-
-        character=source[*processed];
-        if ( !isprint(character) && character != '\t' ) {
-            break;
-        }
-        character=ADJUST_CHARACTER(character);
-
-        if ( *processed == 0 ) {
-            for (size_t k=0; k<num; k++) {
-                nfaStateRecord first_state={0};
-
-                determineNextStateRecord(0,nfa_list[k],0,&first_state,character,flags,next_state_sets+k);
-            }
-        }
-        else {
-            for (size_t k=0; k<num; k++) {
-                nfaStateSet *current;
-
-                current=current_state_sets+k;
-                if ( current->length == 0 ) {
-                    continue;
-                }
-                next_state_sets[k].length=0;
-
-                for (unsigned int j=0; j<current->length; j++) {
-                    determineNextStateRecord(0,nfa_list[k],current->records[j].state,current->records+j,
-                        character,flags,next_state_sets+k);
-                }
-            }
-        }
-
-        for (size_t k=0; k<num; k++) {
-            nfaStateSet *next;
-
-            next=next_state_sets+k;
-
-            if ( next->length > 0 ) {
-                memcpy(current_state_sets[k].records,next->records,sizeof(nfaStateRecord)*next->length);
-                if ( next->length > 1 || next->records[0].state != nfa_list[k]->length ) {
-                    still_alive=true;
-                }
-            }
-        }
-
-        if ( !still_alive ) {
-            break;
-        }
-    }
-
-    *score=0;
-    for (size_t k=0; k<num; k++) {
-        nfaStateSet *current;
-
-        current=current_state_sets+k;
-
-        for (unsigned int j=0; j<current->length; j++) {
-            if ( current->records[j].state == nfa_list[k]->length ) {
-                if ( current->records[j].score > *score ) {
-                    *score=current->records[j].score;
-                    champion=k;
-                }
-            }
-        }
-    }
-
-    return ( *score > 0 )? (ssize_t)champion : -1;
 }
 
 static bool
