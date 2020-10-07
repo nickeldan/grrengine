@@ -7,7 +7,6 @@
 #ifndef __GRR_RUNTIME_H__
 #define __GRR_RUNTIME_H__
 
-#include <stdio.h>
 #include <stdbool.h>
 #include <sys/types.h>
 
@@ -57,23 +56,23 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
           bool tolerant);
 
 /**
- * \brief               Returns the index of regex which matches the most of the input from the file stream.
+ * \brief               Returns the index of regex which matches the most of the input from a buffer.
  *
- * Characters are read from the file stream and stored into destination until EOF is reached, capacity is
- * reached, or a non-printable character or newline is encountered.
+ * Characters are read from the buffer until either the buffer is exhausted, a non-printable character is
+ * encountered, or all of the regexes have given up on matching the text.
  *
  * \param nfa_list      The array of Grr regex objects.
  * \param num           The length of the array.
- * \param file          The file stream.
- * \param destination   Where the read characters will be stored.  If a non-printable character or a newline
- *                      is encountered, it will not be store but will be put back in the stream to be read
- *                      later.
- * \param capacity      The size of the destination buffer.
- * \param size          Pointer to where the number of characters stored in destination will be stored.
+ * \param source        The buffer holding the text.  It does not need to be null-terminated.
+ * \param size          The number of characters to be processed.
+ * \param processed     Pointer to where the number of processed characters is stored.
+ * \param score         If a regex matched some portion of the text, then this points to where the most
+ *                      number of characters matched is stored.
  * \return              The index of the regex with the longest match of the input or -1 if either no such
- *                      match was found or either nfa_list, file, destination, or size is NULL.
+ *                      match was found or any of the parameters were NULL/zero.
  */
 ssize_t
-grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_t capacity, size_t *size);
+grrFirstMatch(grrNfa *nfa_list, size_t num, const char *source, size_t size, size_t *processed,
+              size_t *score);
 
 #endif // __GRR_RUNTIME_H__

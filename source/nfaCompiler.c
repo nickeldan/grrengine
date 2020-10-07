@@ -363,7 +363,7 @@ pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason)
         size_t newCapacity;
 
         newCapacity=stack->capacity+GRR_NFA_PADDING;
-        success=realloc(stack->frames,sizeof(*success)*newCapacity);
+        success=realloc(stack->frames,sizeof(nfaStackFrame)*newCapacity);
         if ( !success ) {
             return GRR_RET_OUT_OF_MEMORY;
         }
@@ -447,7 +447,7 @@ createCharacterNfa(char c)
     grrNfa nfa;
     nfaNode *nodes;
 
-    nodes=calloc(1,sizeof(*nodes));
+    nodes=calloc(1,sizeof(nfaNode));
     if ( !nodes ) {
         return NULL;
     }
@@ -524,14 +524,14 @@ concatenateNfas(grrNfa nfa1, grrNfa nfa2)
     nfaNode *success;
 
     newLen=nfa1->length+nfa2->length;
-    success=realloc(nfa1->nodes,sizeof(*(nfa1->nodes))*newLen);
+    success=realloc(nfa1->nodes,sizeof(nfaNode)*newLen);
     if ( !success ) {
         return GRR_RET_OUT_OF_MEMORY;
     }
 
     nfa1->nodes=success;
 
-    memcpy(nfa1->nodes+nfa1->length,nfa2->nodes,sizeof(*(nfa2->nodes))*nfa2->length);
+    memcpy(nfa1->nodes+nfa1->length,nfa2->nodes,sizeof(nfaNode)*nfa2->length);
     grrFreeNfa(nfa2);
     nfa1->length=newLen;
 
@@ -547,17 +547,17 @@ addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2)
     len1=nfa1->length;
     len2=nfa2->length;
     newLen=1+len1+len2;
-    success=realloc(nfa1->nodes,sizeof(*success)*newLen);
+    success=realloc(nfa1->nodes,sizeof(nfaNode)*newLen);
     if ( !success ) {
         return GRR_RET_OUT_OF_MEMORY;
     }
     nfa1->nodes=success;
 
-    memmove(success+1,success,sizeof(*success)*len1);
-    memcpy(success+1+len1,nfa2->nodes,sizeof(*(nfa2->nodes))*len2);
+    memmove(success+1,success,sizeof(nfaNode)*len1);
+    memcpy(success+1+len1,nfa2->nodes,sizeof(nfaNode)*len2);
     nfa1->length=newLen;
 
-    memset(success,0,sizeof(*success));
+    memset(success,0,sizeof(nfaNode));
     success[0].two_transitions=1;
     for (int k=0; k<2; k++) {
         setSymbol(&success[0].transitions[k],GRR_EMPTY_TRANSITION_CODE);
@@ -614,13 +614,13 @@ checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_
         nfaNode *success;
 
         length=nfa->length;
-        success=realloc(nfa->nodes,sizeof(*success)*(length+1));
+        success=realloc(nfa->nodes,sizeof(nfaNode)*(length+1));
         if ( !success ) {
             return GRR_RET_OUT_OF_MEMORY;
         }
         nfa->nodes=success;
 
-        memset(success+length,0,sizeof(*success));
+        memset(success+length,0,sizeof(nfaNode));
         success[length].two_transitions=1;
         for (int k=0; k<2; k++) {
             setSymbol(&success[length].transitions[k],GRR_EMPTY_TRANSITION_CODE);
@@ -635,14 +635,14 @@ checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_
         if ( nfa->nodes[0].two_transitions ) {
             nfaNode *success;
 
-            success=realloc(nfa->nodes,sizeof(*success)*(nfa->length+1));
+            success=realloc(nfa->nodes,sizeof(nfaNode)*(nfa->length+1));
             if ( !success ) {
                 return GRR_RET_OUT_OF_MEMORY;
             }
             nfa->nodes=success;
 
-            memmove(success+1,success,sizeof(*success)*nfa->length);
-            memset(success,0,sizeof(*success));
+            memmove(success+1,success,sizeof(nfaNode)*nfa->length);
+            memset(success,0,sizeof(nfaNode));
             success[0].two_transitions=1;
 
             for (int k=0; k<2; k++) {
@@ -712,14 +712,14 @@ resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *ne
     }
 
     numNodes=nfa->length;
-    success=realloc(nfa->nodes,sizeof(*success)*numNodes*value);
+    success=realloc(nfa->nodes,sizeof(nfaNode)*numNodes*value);
     if ( !success ) {
         return GRR_RET_OUT_OF_MEMORY;
     }
     nfa->nodes=success;
 
     for (long k=1; k<value; k++) {
-        memcpy(nfa->nodes+k*numNodes,nfa->nodes,sizeof(*success)*numNodes);
+        memcpy(nfa->nodes+k*numNodes,nfa->nodes,sizeof(nfaNode)*numNodes);
     }
 
     nfa->length*=value;
@@ -741,7 +741,7 @@ resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa)
         return GRR_RET_BAD_DATA;
     }
 
-    node=calloc(1,sizeof(*node));
+    node=calloc(1,sizeof(nfaNode));
     if ( !node ) {
         return GRR_RET_OUT_OF_MEMORY;
     }

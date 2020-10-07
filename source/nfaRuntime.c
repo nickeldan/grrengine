@@ -104,11 +104,11 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
     }
 
     length=nfa->length;
-    current_state_set.records=alloca(sizeof(current_state_set.records[0])*(length+1));
-    memset(current_state_set.records,0,sizeof(next_state_set.records[0])*(length+1));
+    current_state_set.records=alloca(sizeof(nfaStateRecord)*(length+1));
+    memset(current_state_set.records,0,sizeof(nfaStateRecord)*(length+1));
     current_state_set.length=0;
 
-    next_state_set.records=alloca(sizeof(next_state_set.records[0])*(length+1));
+    next_state_set.records=alloca(sizeof(nfaStateRecord)*(length+1));
 
     for (size_t idx=0; idx<len; idx++) {
         char character;
@@ -140,14 +140,14 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
                 if ( current_state_set.records[k].state == length ) {
                     if ( k > 0 ) {
                         memcpy(current_state_set.records+0,current_state_set.records+k,
-                            sizeof(current_state_set.records[0]));
+                            sizeof(nfaStateRecord));
                     }
                     goto skip_over_clear;
                 }
             }
 
             memset(current_state_set.records,0,
-                sizeof(current_state_set.records[0])*current_state_set.length);
+                sizeof(nfaStateRecord)*current_state_set.length);
 
             skip_over_clear:
             do {
@@ -182,7 +182,7 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
         determineNextStateRecord(0,nfa,0,&first_state,character,flags,&next_state_set);
 
         memcpy(current_state_set.records,next_state_set.records,
-            sizeof(next_state_set.records[0])*next_state_set.length);
+            sizeof(nfaStateRecord)*next_state_set.length);
         current_state_set.length=next_state_set.length;
     }
 
@@ -203,13 +203,14 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
 }
 
 ssize_t
-grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_t capacity, size_t *size)
+grrFirstMatch(grrNfa *nfa_list, size_t num, const char *source, size_t size, size_t *processed,
+              size_t *score)
 {
     unsigned char flags=GRR_NFA_FIRST_CHAR_FLAG|GRR_NFA_LAST_CHAR_FLAG;
-    size_t champion, champion_score;
+    size_t champion;
     nfaStateSet current_state_sets[num], next_state_sets[num];
-
-    if ( !nfa_list || num == 0 || !file || !destination || !size ) {
+    
+    if ( !nfa_list || num == 0 || !source || size == 0 || !processed ) {
         return -1;
     }
 
@@ -220,28 +221,21 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
         next_state_sets[k].records=alloca(sizeof(nfaStateRecord)*(nfa_list[k]->length+1));
     }
 
-    for (*size=0; *size<capacity; (*size)++) {
-        int character;
-        char adjusted;
+    for (*processed=0; *processed<size; (*processed)++) {
+        char character;
         bool still_alive=false;
 
-        character=destination[*size]=fgetc(file);
-        if ( character == EOF ) {
-            break;
-        }
-
+        character=source[*processed];
         if ( !isprint(character) && character != '\t' ) {
-            ungetc(character,file);
             break;
         }
+        character=ADJUST_CHARACTER(character);
 
-        adjusted=ADJUST_CHARACTER(character);
-        
-        if ( *size == 0 ) {
+        if ( *processed == 0 ) {
             for (size_t k=0; k<num; k++) {
                 nfaStateRecord first_state={0};
 
-                determineNextStateRecord(0,nfa_list[k],0,&first_state,adjusted,flags,next_state_sets+k);
+                determineNextStateRecord(0,nfa_list[k],0,&first_state,character,flags,next_state_sets+k);
             }
         }
         else {
@@ -256,7 +250,7 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
 
                 for (unsigned int j=0; j<current->length; j++) {
                     determineNextStateRecord(0,nfa_list[k],current->records[j].state,current->records+j,
-                        adjusted,flags,next_state_sets+k);
+                        character,flags,next_state_sets+k);
                 }
             }
         }
@@ -275,12 +269,11 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
         }
 
         if ( !still_alive ) {
-            ungetc(character,file);
             break;
         }
     }
 
-    champion_score=0;
+    *score=0;
     for (size_t k=0; k<num; k++) {
         nfaStateSet *current;
 
@@ -288,15 +281,15 @@ grrFirstMatch(grrNfa *nfa_list, size_t num, FILE *file, char *destination, size_
 
         for (unsigned int j=0; j<current->length; j++) {
             if ( current->records[j].state == nfa_list[k]->length ) {
-                if ( current->records[j].score > champion_score ) {
-                    champion_score=current->records[j].score;
+                if ( current->records[j].score > *score ) {
+                    *score=current->records[j].score;
                     champion=k;
                 }
             }
         }
     }
 
-    return ( champion_score > 0 )? (ssize_t)champion : -1;
+    return ( *score > 0 )? (ssize_t)champion : -1;
 }
 
 static bool
