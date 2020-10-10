@@ -1,3 +1,8 @@
+2.0.1:
+    - Fixed an infinite loop issue.
+    - The '$' symbol wasn't being properly recognized.
+    - The '.' symbol wasn't being properly recognized.
+
 2.0.0:
     - grrMatch can no longer return GRR_RET_OUT_OF_MEMORY.
     - grrMatch now ignores the ^ and $ regex special characters.
