@@ -482,8 +482,8 @@ setSymbol(nfaTransition *transition, char c)
         goto set_character;
 
         case GRR_WILDCARD_CODE:
-        memset(transition->symbols+1,0xff,sizeof(transition->symbols)-1);
-        transition->symbols[0] |= 0xfe;
+        memset(transition->symbols,0xff,sizeof(transition->symbols));
+        transition->symbols[0] &= ~(GRR_NFA_EMPTY_TRANSITION_FLAG|GRR_NFA_FIRST_CHAR_FLAG|GRR_NFA_LAST_CHAR_FLAG|GRR_NFA_LOOKAHEAD_FLAG);
         break;
 
         case GRR_EMPTY_TRANSITION_CODE:

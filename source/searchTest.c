@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     ret=grrSearch(nfa,argv[2],strlen(argv[2]),&start,&end,NULL,false);
     grrFreeNfa(nfa);
     if ( ret == GRR_RET_OK ) {
-        printf("A string matched the regex from indices %zu to %zu.\n", start, end);
+        printf("A string matched the regex from indices %zu to %zu.\n", start, end-1);
     }
     else if ( ret == GRR_RET_NOT_FOUND ) {
         printf("No substring match the regex.\n");
