@@ -23,7 +23,7 @@
  *                  GRR_RET_BAD_DATA if the string contained a non-printable character.
  */
 int
-grrMatch(const grrNfa nfa, const char *string, size_t len);
+grrMatch(grrNfa nfa, const char *string, size_t len);
 
 /**
  * \brief            Determines if a string contains a substring which matches the regex.

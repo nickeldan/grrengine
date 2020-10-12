@@ -12,6 +12,6 @@ void grrFreeNfa(grrNfa nfa) {
     free(nfa);
 }
 
-const char *grrDescription(const grrNfa nfa) {
+const char *grrDescription(grrNfa nfa) {
     return nfa->string;
 }

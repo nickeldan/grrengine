@@ -31,6 +31,6 @@ grrFreeNfa(grrNfa nfa);
  * \return      The string which created the regex object.
  */
 const char*
-grrDescription(const grrNfa nfa);
+grrDescription(grrNfa nfa);
 
 #endif // __GRR_ENGINE_NFA_H__

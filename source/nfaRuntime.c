@@ -38,7 +38,7 @@ static void
 maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score);
 
 int
-grrMatch(const grrNfa nfa, const char *string, size_t len)
+grrMatch(grrNfa nfa, const char *string, size_t len)
 {
     unsigned int state_set_len=(nfa->length+1+7)/8; // The +1 is for the accepting state.
     unsigned char current_state_set[state_set_len], next_state_set[state_set_len];
