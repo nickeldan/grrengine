@@ -35,7 +35,8 @@ typedef struct nfaStack {
     size_t capacity;
 } nfaStack;
 
-#define NEW_NFA() calloc(1,sizeof(struct grrNfaStruct))
+static grrNfa
+newNfa(void);
 
 static void
 printIdxForString(const char *string, size_t len, size_t idx);
@@ -91,7 +92,7 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
         }
     }
 
-    current=NEW_NFA();
+    current=newNfa();
     if ( !current ) {
         return GRR_RET_OUT_OF_MEMORY;
     }
@@ -109,7 +110,7 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
             if ( ret != GRR_RET_OK ) {
                 goto error;
             }
-            current=NEW_NFA();
+            current=newNfa();
             if ( !current ) {
                 ret=GRR_RET_OUT_OF_MEMORY;
                 goto error;
@@ -345,6 +346,18 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
     return ret;
 }
 
+static grrNfa
+newNfa(void)
+{
+    grrNfa nfa;
+
+    nfa=malloc(sizeof(struct grrNfaStruct));
+    if ( nfa ) {
+        *nfa=(struct grrNfaStruct){0};
+    }
+    return nfa;
+}
+
 static void
 printIdxForString(const char *string, size_t len, size_t idx)
 {
@@ -458,7 +471,7 @@ createCharacterNfa(char c)
         setSymbol(&nodes->transitions[0],GRR_EMPTY_TRANSITION_CODE);
     }
 
-    nfa=NEW_NFA();
+    nfa=newNfa();
     if ( !nfa ) {
         free(nodes);
         return NULL;
@@ -852,7 +865,7 @@ resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa)
 
     node->transitions[0].motion=1;
 
-    *nfa=NEW_NFA();
+    *nfa=newNfa();
     if ( !*nfa ) {
         ret=GRR_RET_OUT_OF_MEMORY;
         goto error;
