@@ -79,7 +79,7 @@ grrMatch(grrNfa nfa, const char *string, size_t len)
         memcpy(current_state_set,next_state_set,state_set_len);
     }
 
-    for (unsigned int k=0; k<nfa->length; k++) {
+    for (unsigned int k=0; k<=nfa->length; k++) {
         if ( IS_FLAG_SET(current_state_set,k) ) {
             unsigned char visited_states[state_set_len];
 

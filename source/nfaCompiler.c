@@ -126,10 +126,7 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
                 goto error;
             }
 
-            if ( (size_t)stackIdx == stack.length-1 ) { // The parentheses were empty.
-                grrFreeNfa(current);
-            }
-            else {
+            if ( (size_t)stackIdx < stack.length-1 ) {
                 temp=stack.frames[stackIdx+1].nfa;
                 stack.frames[stackIdx+1].nfa=NULL;
 
@@ -148,17 +145,17 @@ grrCompile(const char *string, size_t len, grrNfa *nfa)
                     goto error;
                 }
                 current=temp;
+            }
 
-                ret=checkForQuantifier(current,string,len,idx,&idx);
-                if ( ret != GRR_RET_OK ) {
-                    grrFreeNfa(temp);
-                    goto error;
-                }
+            ret=checkForQuantifier(current,string,len,idx,&idx);
+            if ( ret != GRR_RET_OK ) {
+                grrFreeNfa(temp);
+                goto error;
+            }
 
-                ret=concatenateNfas(stack.frames[stackIdx].nfa,current);
-                if ( ret != GRR_RET_OK ) {
-                    goto error;
-                }
+            ret=concatenateNfas(stack.frames[stackIdx].nfa,current);
+            if ( ret != GRR_RET_OK ) {
+                goto error;
             }
 
             current=stack.frames[stackIdx].nfa;

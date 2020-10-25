@@ -1,5 +1,5 @@
 GrrEngine was written by Daniel Walker.
-Version 2.0.1 was released on October 10, 2020.
+Version 2.0.2 was released on October 24, 2020.
 
 All access to the API is acquired by including nfa.h.  See the documentation for further details.
 
