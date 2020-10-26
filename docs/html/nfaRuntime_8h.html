@@ -72,8 +72,7 @@ $(function() {
 
 <p>Regex-matching functions.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
-<code>#include &lt;stdbool.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;sys/types.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="nfaDef_8h_source.html">nfaDef.h</a>&quot;</code><br />
 </div>
@@ -81,21 +80,21 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a17c42a4f6b487298bd860525722bed87"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nfaRuntime_8h.html#a17c42a4f6b487298bd860525722bed87">grrMatch</a> (const <a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> nfa, const char *string, size_t len)</td></tr>
-<tr class="memdesc:a17c42a4f6b487298bd860525722bed87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if the entire string matches the regex.  <a href="nfaRuntime_8h.html#a17c42a4f6b487298bd860525722bed87">More...</a><br /></td></tr>
-<tr class="separator:a17c42a4f6b487298bd860525722bed87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6557d035d391628f6df01dddeb490811"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nfaRuntime_8h.html#a6557d035d391628f6df01dddeb490811">grrMatch</a> (<a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> nfa, const char *string, size_t len)</td></tr>
+<tr class="memdesc:a6557d035d391628f6df01dddeb490811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if the entire string matches the regex.  <a href="nfaRuntime_8h.html#a6557d035d391628f6df01dddeb490811">More...</a><br /></td></tr>
+<tr class="separator:a6557d035d391628f6df01dddeb490811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14200df8aa9eeee41c91634b5b90bd0e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nfaRuntime_8h.html#a14200df8aa9eeee41c91634b5b90bd0e">grrSearch</a> (<a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> nfa, const char *string, size_t len, size_t *start, size_t *end, size_t *cursor, bool tolerant)</td></tr>
 <tr class="memdesc:a14200df8aa9eeee41c91634b5b90bd0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if a string contains a substring which matches the regex.  <a href="nfaRuntime_8h.html#a14200df8aa9eeee41c91634b5b90bd0e">More...</a><br /></td></tr>
 <tr class="separator:a14200df8aa9eeee41c91634b5b90bd0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a046e6c73954ed8432cea330ea4c0b5cc"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nfaRuntime_8h.html#a046e6c73954ed8432cea330ea4c0b5cc">grrFirstMatch</a> (<a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> *nfa_list, size_t num, FILE *file, char *destination, size_t capacity, size_t *size)</td></tr>
-<tr class="memdesc:a046e6c73954ed8432cea330ea4c0b5cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of regex which matches most of the input from the file stream.  <a href="nfaRuntime_8h.html#a046e6c73954ed8432cea330ea4c0b5cc">More...</a><br /></td></tr>
-<tr class="separator:a046e6c73954ed8432cea330ea4c0b5cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff8de1b566ebe2f775698d33677c9d54"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nfaRuntime_8h.html#aff8de1b566ebe2f775698d33677c9d54">grrFirstMatch</a> (<a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> *nfa_list, size_t num, const char *source, size_t size, size_t *processed, size_t *score)</td></tr>
+<tr class="memdesc:aff8de1b566ebe2f775698d33677c9d54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of regex which matches the most of the input from a buffer.  <a href="nfaRuntime_8h.html#aff8de1b566ebe2f775698d33677c9d54">More...</a><br /></td></tr>
+<tr class="separator:aff8de1b566ebe2f775698d33677c9d54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Regex-matching functions. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a046e6c73954ed8432cea330ea4c0b5cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a046e6c73954ed8432cea330ea4c0b5cc">&#9670;&nbsp;</a></span>grrFirstMatch()</h2>
+<a id="aff8de1b566ebe2f775698d33677c9d54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff8de1b566ebe2f775698d33677c9d54">&#9670;&nbsp;</a></span>grrFirstMatch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -115,26 +114,26 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">FILE *&#160;</td>
-          <td class="paramname"><em>file</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>destination</em>, </td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>capacity</em>, </td>
+          <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t *&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
+          <td class="paramname"><em>processed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>score</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -144,25 +143,25 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the index of regex which matches most of the input from the file stream. </p>
-<p>Characters are read from the file stream and stored into destination until EOF is reached, capacity is reached, or a non-printable character or newline is encountered.</p>
+<p>Returns the index of regex which matches the most of the input from a buffer. </p>
+<p>Characters are read from the buffer until either the buffer is exhausted, a non-printable character is encountered, or all of the regexes have given up on matching the text.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">nfa_list</td><td>The array of Grr regex objects. </td></tr>
+    <tr><td class="paramname">nfa_list</td><td>The array of GrrEngine regex objects. </td></tr>
     <tr><td class="paramname">num</td><td>The length of the array. </td></tr>
-    <tr><td class="paramname">file</td><td>The file stream. </td></tr>
-    <tr><td class="paramname">destination</td><td>Where the read characters will be stored. If a non-printable character or a newline is encountered, it will not be store but will be put back in the stream to be read later. </td></tr>
-    <tr><td class="paramname">capacity</td><td>The size of the destination buffer. </td></tr>
-    <tr><td class="paramname">size</td><td>*size will hold will number of characters stored in destination. </td></tr>
+    <tr><td class="paramname">source</td><td>The buffer holding the text. It does not need to be null-terminated. </td></tr>
+    <tr><td class="paramname">size</td><td>The number of characters to be processed. </td></tr>
+    <tr><td class="paramname">processed</td><td>Pointer to where the number of processed characters is stored. </td></tr>
+    <tr><td class="paramname">score</td><td>If a regex matched some portion of the text, then this points to where the most number of characters matched is stored. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The index of the regex with the longest match of the input or -1 if either no such match was found or either nfa_list, file, destination, or size is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The index of the regex with the longest match of the input or -1 if either no such match was found or any of the parameters were NULL/zero. </dd></dl>
 
 </div>
 </div>
-<a id="a17c42a4f6b487298bd860525722bed87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17c42a4f6b487298bd860525722bed87">&#9670;&nbsp;</a></span>grrMatch()</h2>
+<a id="a6557d035d391628f6df01dddeb490811"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6557d035d391628f6df01dddeb490811">&#9670;&nbsp;</a></span>grrMatch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +169,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int grrMatch </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a>&#160;</td>
           <td class="paramname"><em>nfa</em>, </td>
         </tr>
         <tr>
@@ -196,13 +195,13 @@ Functions</h2></td></tr>
 <p>Determines if the entire string matches the regex. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">nfa</td><td>The Grr regex object. </td></tr>
+    <tr><td class="paramname">nfa</td><td>The GrrEngine regex object. </td></tr>
     <tr><td class="paramname">string</td><td>The string (does not have to be null-terminated). </td></tr>
     <tr><td class="paramname">len</td><td>The length of the string. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>GRR_RET_OK if the string matched the regex. GRR_RET_BAD_ARGS is either nfa or string is NULL. GRR_RET_OUT_MEMORY if a memory allocation failed. GRR_RET_BAD_DATA if the string contained a non-printable character. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>GRR_RET_OK if the string matched the regex. GRR_RET_BAD_ARGS is either nfa or string is NULL. GRR_RET_BAD_DATA if the string contained a non-printable character. </dd></dl>
 
 </div>
 </div>
@@ -263,10 +262,10 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Determines if a string contains a substring which matches the regex. </p>
-<p>The function will stop processing characters when either it exhausts the specified length, a newline is encountered, or a non-printable character is encountered with tolerateNonprintables set to false. If tolerateNonprintables is true, then the function will skip over such characters and treat them as beginning and end of lines. For example, if the regex is "^a+" and the string is "aa\x00aaad", then both sequences of "a"'s will be considered matches. However, they will be considered separate matches and so *end-*start will be 3.</p>
+<p>The function will stop processing characters when either it exhausts the specified length, a newline is encountered, or a non-printable character is encountered with tolerant set to false. If tolerant is true, then the function will skip over such characters and treat them as beginning and end of lines. For example, if the regex is "^a+" and the string is "aa\x00aaad", then both sequences of "a"'s will be considered matches. However, they will be considered separate matches and so *end-*start will be 3.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">nfa</td><td>The Grr regex object. </td></tr>
+    <tr><td class="paramname">nfa</td><td>The GrrEngine regex object. </td></tr>
     <tr><td class="paramname">string</td><td>The string (does not have to be null-terminated). </td></tr>
     <tr><td class="paramname">len</td><td>The length of the string. </td></tr>
     <tr><td class="paramname">start</td><td>A pointer which will, if not NULL, point to the index of the beginning of the longest match if one was found. </td></tr>

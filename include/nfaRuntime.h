@@ -15,7 +15,7 @@
 /**
  * \brief           Determines if the entire string matches the regex.
  *
- * \param nfa       The Grr regex object.
+ * \param nfa       The GrrEngine regex object.
  * \param string    The string (does not have to be null-terminated).
  * \param len       The length of the string.
  * \return          GRR_RET_OK if the string matched the regex.
@@ -34,7 +34,7 @@ grrMatch(grrNfa nfa, const char *string, size_t len);
  * example, if the regex is "^a+" and the string is "aa\x00aaad", then both sequences of "a"'s will be
  * considered matches.  However, they will be considered separate matches and so *end-*start will be 3.
  *
- * \param nfa       The Grr regex object.
+ * \param nfa       The GrrEngine regex object.
  * \param string    The string (does not have to be null-terminated).
  * \param len       The length of the string.
  * \param start     A pointer which will, if not NULL, point to the index of the beginning of the longest
@@ -61,7 +61,7 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
  * Characters are read from the buffer until either the buffer is exhausted, a non-printable character is
  * encountered, or all of the regexes have given up on matching the text.
  *
- * \param nfa_list      The array of Grr regex objects.
+ * \param nfa_list      The array of GrrEngine regex objects.
  * \param num           The length of the array.
  * \param source        The buffer holding the text.  It does not need to be null-terminated.
  * \param size          The number of characters to be processed.

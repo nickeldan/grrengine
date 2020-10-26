@@ -123,11 +123,11 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">string</td><td>The string to be compiled (does not have to be null-terminated). </td></tr>
     <tr><td class="paramname">len</td><td>The length of the string. </td></tr>
-    <tr><td class="paramname">nfa</td><td>A pointer to the Grr regex object to be populated. </td></tr>
+    <tr><td class="paramname">nfa</td><td>A pointer to the GrrEngine regex object to be populated. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>GRR_RET_OK if successful. GRR_RET_BAD_DATA if the string contained non-printable characters. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>GRR_RET_OK if successful. GRR_RET_BAD_ARGS if either string or nfa is NULL. GRR_RET_BAD_DATA if the string contained non-printable characters. </dd></dl>
 
 </div>
 </div>

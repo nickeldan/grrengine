@@ -68,8 +68,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="nfa_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#ifndef __GRR_NFA_H__</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#define __GRR_NFA_H__</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#ifndef __GRR_ENGINE_NFA_H__</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#define __GRR_ENGINE_NFA_H__</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="nfaDef_8h.html">nfaDef.h</a>&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="nfaCompiler_8h.html">nfaCompiler.h</a>&quot;</span></div>
@@ -79,16 +79,16 @@ $(function() {
 <div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="nfa_8h.html#aafe0416b157779d8b9cfa247a507a4c8">   21</a></span>&#160;<a class="code" href="nfa_8h.html#aafe0416b157779d8b9cfa247a507a4c8">grrFreeNfa</a>(<a class="code" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> nfa);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span>*</div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="nfa_8h.html#a5eedf258c592ba2c02c45d0c967e7649">   34</a></span>&#160;<a class="code" href="nfa_8h.html#a5eedf258c592ba2c02c45d0c967e7649">grrDescription</a>(<span class="keyword">const</span> <a class="code" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> nfa);</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="nfa_8h.html#ade4aeb5396804299c8069642b0a788a1">   34</a></span>&#160;<a class="code" href="nfa_8h.html#ade4aeb5396804299c8069642b0a788a1">grrDescription</a>(<a class="code" href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a> nfa);</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// __GRR_NFA_H__</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// __GRR_ENGINE_NFA_H__</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="anfaDef_8h_html"><div class="ttname"><a href="nfaDef_8h.html">nfaDef.h</a></div><div class="ttdoc">Basic Grr definitions.</div></div>
+<div class="ttc" id="anfaDef_8h_html"><div class="ttname"><a href="nfaDef_8h.html">nfaDef.h</a></div><div class="ttdoc">Basic GrrEngine definitions.</div></div>
 <div class="ttc" id="anfaCompiler_8h_html"><div class="ttname"><a href="nfaCompiler_8h.html">nfaCompiler.h</a></div><div class="ttdoc">Compile regexes.</div></div>
 <div class="ttc" id="anfa_8h_html_aafe0416b157779d8b9cfa247a507a4c8"><div class="ttname"><a href="nfa_8h.html#aafe0416b157779d8b9cfa247a507a4c8">grrFreeNfa</a></div><div class="ttdeci">void grrFreeNfa(grrNfa nfa)</div><div class="ttdoc">Frees a regex object.</div></div>
-<div class="ttc" id="anfaDef_8h_html_a8dc2a3a897ffdcfa126a67035ce05079"><div class="ttname"><a href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a></div><div class="ttdeci">struct grrNfaStruct * grrNfa</div><div class="ttdoc">An opaque reference to Grr's regex object.</div><div class="ttdef"><b>Definition:</b> nfaDef.h:28</div></div>
+<div class="ttc" id="anfaDef_8h_html_a8dc2a3a897ffdcfa126a67035ce05079"><div class="ttname"><a href="nfaDef_8h.html#a8dc2a3a897ffdcfa126a67035ce05079">grrNfa</a></div><div class="ttdeci">struct grrNfaStruct * grrNfa</div><div class="ttdoc">An opaque reference to GrrEngine's regex object.</div><div class="ttdef"><b>Definition:</b> nfaDef.h:28</div></div>
 <div class="ttc" id="anfaRuntime_8h_html"><div class="ttname"><a href="nfaRuntime_8h.html">nfaRuntime.h</a></div><div class="ttdoc">Regex-matching functions.</div></div>
-<div class="ttc" id="anfa_8h_html_a5eedf258c592ba2c02c45d0c967e7649"><div class="ttname"><a href="nfa_8h.html#a5eedf258c592ba2c02c45d0c967e7649">grrDescription</a></div><div class="ttdeci">const char * grrDescription(const grrNfa nfa)</div><div class="ttdoc">Returns the string that created the regex object.</div></div>
+<div class="ttc" id="anfa_8h_html_ade4aeb5396804299c8069642b0a788a1"><div class="ttname"><a href="nfa_8h.html#ade4aeb5396804299c8069642b0a788a1">grrDescription</a></div><div class="ttdeci">const char * grrDescription(grrNfa nfa)</div><div class="ttdoc">Returns the string that created the regex object.</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.0

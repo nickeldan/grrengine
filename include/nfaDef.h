@@ -1,6 +1,6 @@
 /**
  * \file    nfaDef.h
- * \brief   Basic Grr definitions.
+ * \brief   Basic GrrEngine definitions.
  */
 
 #ifndef __GRR_ENGINE_NFA_DEF_H__
@@ -23,7 +23,7 @@ enum grrRetValue {
 };
 
 /**
- * \brief   An opaque reference to Grr's regex object.
+ * \brief   An opaque reference to GrrEngine's regex object.
  */
 typedef struct grrNfaStruct *grrNfa;
 

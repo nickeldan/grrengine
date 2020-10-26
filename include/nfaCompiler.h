@@ -15,7 +15,7 @@
  *
  *  \param string   The string to be compiled (does not have to be null-terminated).
  *  \param len      The length of the string.
- *  \param nfa      A pointer to the Grr regex object to be populated.
+ *  \param nfa      A pointer to the GrrEngine regex object to be populated.
  *  \return         GRR_RET_OK if successful.
  *                  GRR_RET_BAD_ARGS if either string or nfa is NULL.
  *                  GRR_RET_BAD_DATA if the string contained non-printable characters.
