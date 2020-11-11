@@ -21,6 +21,6 @@
  *                  GRR_RET_BAD_DATA if the string contained non-printable characters.
  */
 int
-grrCompile(const char *string, size_t len, grrNfa *nfa);
+grrCompile(const char* string, size_t len, grrNfa* nfa);
 
-#endif // __GRR_ENGINE_COMPILER_H__
+#endif  // __GRR_ENGINE_COMPILER_H__

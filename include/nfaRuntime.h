@@ -23,7 +23,7 @@
  *                  GRR_RET_BAD_DATA if the string contained a non-printable character.
  */
 int
-grrMatch(grrNfa nfa, const char *string, size_t len);
+grrMatch(grrNfa nfa, const char* string, size_t len);
 
 /**
  * \brief            Determines if a string contains a substring which matches the regex.
@@ -52,7 +52,7 @@ grrMatch(grrNfa nfa, const char *string, size_t len);
  *                  to false.
  */
 int
-grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end, size_t *cursor,
+grrSearch(grrNfa nfa, const char* string, size_t len, size_t* start, size_t* end, size_t* cursor,
           bool tolerant);
 
 /**
@@ -72,7 +72,7 @@ grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end
  *                      match was found or any of the parameters were NULL/zero.
  */
 ssize_t
-grrFirstMatch(grrNfa *nfa_list, size_t num, const char *source, size_t size, size_t *processed,
-              size_t *score);
+grrFirstMatch(grrNfa* nfa_list, size_t num, const char* source, size_t size, size_t* processed,
+              size_t* score);
 
-#endif // __GRR_RUNTIME_H__
+#endif  // __GRR_RUNTIME_H__

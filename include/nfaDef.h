@@ -25,6 +25,6 @@ enum grrRetValue {
 /**
  * \brief   An opaque reference to GrrEngine's regex object.
  */
-typedef struct grrNfaStruct *grrNfa;
+typedef struct grrNfaStruct* grrNfa;
 
-#endif // __GRR_ENGINE_NFA_DEF_H__
+#endif  // __GRR_ENGINE_NFA_DEF_H__

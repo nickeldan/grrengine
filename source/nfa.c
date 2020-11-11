@@ -2,8 +2,9 @@
 
 #include "nfaInternals.h"
 
-void grrFreeNfa(grrNfa nfa) {
-    if ( !nfa ) {
+void
+grrFreeNfa(grrNfa nfa) {
+    if (!nfa) {
         return;
     }
 
@@ -12,6 +13,7 @@ void grrFreeNfa(grrNfa nfa) {
     free(nfa);
 }
 
-const char *grrDescription(grrNfa nfa) {
+const char*
+grrDescription(grrNfa nfa) {
     return nfa->string;
 }

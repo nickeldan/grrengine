@@ -6,8 +6,8 @@
 #ifndef __GRR_ENGINE_NFA_H__
 #define __GRR_ENGINE_NFA_H__
 
-#include "nfaDef.h"
 #include "nfaCompiler.h"
+#include "nfaDef.h"
 #include "nfaRuntime.h"
 
 /**
@@ -33,4 +33,4 @@ grrFreeNfa(grrNfa nfa);
 const char*
 grrDescription(grrNfa nfa);
 
-#endif // __GRR_ENGINE_NFA_H__
+#endif  // __GRR_ENGINE_NFA_H__
