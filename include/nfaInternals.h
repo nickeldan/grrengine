@@ -34,8 +34,8 @@ typedef struct nfaNode {
 } nfaNode;
 
 struct grrNfaStruct {
-    nfaNode* nodes;
-    char* string;
+    nfaNode *nodes;
+    char *string;
     unsigned int length;
 };
 

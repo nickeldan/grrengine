@@ -26,7 +26,7 @@ typedef struct nfaStackFrame {
 } nfaStackFrame;
 
 typedef struct nfaStack {
-    nfaStackFrame* frames;
+    nfaStackFrame *frames;
     size_t length;
     size_t capacity;
 } nfaStack;
@@ -35,16 +35,16 @@ static grrNfa
 newNfa(void);
 
 static void
-printIdxForString(const char* string, size_t len, size_t idx);
+printIdxForString(const char *string, size_t len, size_t idx);
 
 static int
-pushNfaToStack(nfaStack* stack, grrNfa nfa, size_t idx, char reason);
+pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason);
 
 static void
-freeNfaStack(nfaStack* stack);
+freeNfaStack(nfaStack *stack);
 
 static ssize_t
-findParensInStack(const nfaStack* stack);
+findParensInStack(const nfaStack *stack);
 
 static char
 resolveEscapeCharacter(char c) __attribute__((pure));
@@ -53,7 +53,7 @@ static grrNfa
 createCharacterNfa(char c);
 
 static void
-setSymbol(nfaTransition* transition, char c);
+setSymbol(nfaTransition *transition, char c);
 
 static int
 concatenateNfas(grrNfa nfa1, grrNfa nfa2);
@@ -62,16 +62,16 @@ static int
 addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2);
 
 static int
-checkForQuantifier(grrNfa nfa, const char* string, size_t len, size_t idx, size_t* newIdx);
+checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
 
 static int
-resolveBraces(grrNfa nfa, const char* string, size_t len, size_t idx, size_t* newIdx);
+resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx);
 
 static int
-resolveCharacterClass(const char* string, size_t len, size_t* idx, grrNfa* nfa);
+resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa);
 
 int
-grrCompile(const char* string, size_t len, grrNfa* nfa) {
+grrCompile(const char *string, size_t len, grrNfa *nfa) {
     int ret;
     nfaStack stack = {0};
     grrNfa current;
@@ -344,7 +344,7 @@ newNfa(void) {
 }
 
 static void
-printIdxForString(const char* string, size_t len, size_t idx) {
+printIdxForString(const char *string, size_t len, size_t idx) {
     fprintf(stderr, "\t%.*s\n\t", (int)len, string);
     for (size_t k = 0; k < idx; k++) {
         fprintf(stderr, " ");
@@ -353,9 +353,9 @@ printIdxForString(const char* string, size_t len, size_t idx) {
 }
 
 static int
-pushNfaToStack(nfaStack* stack, grrNfa nfa, size_t idx, char reason) {
+pushNfaToStack(nfaStack *stack, grrNfa nfa, size_t idx, char reason) {
     if (stack->length == stack->capacity) {
-        nfaStackFrame* success;
+        nfaStackFrame *success;
         size_t newCapacity;
 
         newCapacity = stack->capacity + GRR_NFA_PADDING;
@@ -377,7 +377,7 @@ pushNfaToStack(nfaStack* stack, grrNfa nfa, size_t idx, char reason) {
 }
 
 static void
-freeNfaStack(nfaStack* stack) {
+freeNfaStack(nfaStack *stack) {
     size_t len;
 
     len = stack->length;
@@ -388,7 +388,7 @@ freeNfaStack(nfaStack* stack) {
 }
 
 static ssize_t
-findParensInStack(const nfaStack* stack) {
+findParensInStack(const nfaStack *stack) {
     for (ssize_t idx = (ssize_t)stack->length - 1; idx >= 0; idx--) {
         if (stack->frames[idx].nfa && stack->frames[idx].reason == '(') {
             return idx;
@@ -430,7 +430,7 @@ resolveEscapeCharacter(char c) {
 static grrNfa
 createCharacterNfa(char c) {
     grrNfa nfa;
-    nfaNode* nodes;
+    nfaNode *nodes;
 
     nodes = calloc(1, sizeof(nfaNode));
     if (!nodes) {
@@ -456,7 +456,7 @@ createCharacterNfa(char c) {
 }
 
 static void
-setSymbol(nfaTransition* transition, char c) {
+setSymbol(nfaTransition *transition, char c) {
     char c2;
 
     switch (c) {
@@ -497,7 +497,7 @@ set_character:
 static int
 concatenateNfas(grrNfa nfa1, grrNfa nfa2) {
     size_t newLen;
-    nfaNode* success;
+    nfaNode *success;
 
     newLen = nfa1->length + nfa2->length;
     success = realloc(nfa1->nodes, sizeof(nfaNode) * newLen);
@@ -517,7 +517,7 @@ concatenateNfas(grrNfa nfa1, grrNfa nfa2) {
 static int
 addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2) {
     unsigned int newLen, len1, len2;
-    nfaNode* success;
+    nfaNode *success;
 
     len1 = nfa1->length;
     len2 = nfa2->length;
@@ -553,7 +553,7 @@ addDisjunctionToNfa(grrNfa nfa1, grrNfa nfa2) {
 }
 
 static int
-checkForQuantifier(grrNfa nfa, const char* string, size_t len, size_t idx, size_t* newIdx) {
+checkForQuantifier(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx) {
     bool question = false, plus = false;
 
     if (idx + 1 == len) {
@@ -576,7 +576,7 @@ checkForQuantifier(grrNfa nfa, const char* string, size_t len, size_t idx, size_
 
     if (plus) {
         unsigned int length;
-        nfaNode* success;
+        nfaNode *success;
 
         length = nfa->length;
         success = realloc(nfa->nodes, sizeof(nfaNode) * (length + 1));
@@ -598,7 +598,7 @@ checkForQuantifier(grrNfa nfa, const char* string, size_t len, size_t idx, size_
 
     if (question) {
         if (nfa->nodes[0].two_transitions) {
-            nfaNode* success;
+            nfaNode *success;
 
             success = realloc(nfa->nodes, sizeof(nfaNode) * (nfa->length + 1));
             if (!success) {
@@ -618,7 +618,7 @@ checkForQuantifier(grrNfa nfa, const char* string, size_t len, size_t idx, size_
 
             nfa->length++;
         } else {
-            nfaNode* node;
+            nfaNode *node;
 
             node = nfa->nodes;
             memset(node->transitions[1].symbols, 0, sizeof(nfa->nodes[0].transitions[1].symbols));
@@ -632,11 +632,11 @@ checkForQuantifier(grrNfa nfa, const char* string, size_t len, size_t idx, size_
 }
 
 static int
-resolveBraces(grrNfa nfa, const char* string, size_t len, size_t idx, size_t* newIdx) {
+resolveBraces(grrNfa nfa, const char *string, size_t len, size_t idx, size_t *newIdx) {
     size_t end, numNodes;
     long value;
     char *buffer, *temp;
-    nfaNode* success;
+    nfaNode *success;
 
     for (end = idx + 1; end < len && string[end] != '}'; end++) {
         if (!isdigit(string[end])) {
@@ -691,11 +691,11 @@ resolveBraces(grrNfa nfa, const char* string, size_t len, size_t idx, size_t* ne
 }
 
 static int
-resolveCharacterClass(const char* string, size_t len, size_t* idx, grrNfa* nfa) {
+resolveCharacterClass(const char *string, size_t len, size_t *idx, grrNfa *nfa) {
     int ret;
     size_t idx2;
     bool negation;
-    nfaNode* node;
+    nfaNode *node;
 
     if (*idx == len - 1) {
         fprintf(stderr, "Unclosed character class:\n");

@@ -13,7 +13,7 @@ grrFreeNfa(grrNfa nfa) {
     free(nfa);
 }
 
-const char*
+const char *
 grrDescription(grrNfa nfa) {
     return nfa->string;
 }

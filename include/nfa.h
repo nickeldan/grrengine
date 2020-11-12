@@ -30,7 +30,7 @@ grrFreeNfa(grrNfa nfa);
  *
  * \return      The string which created the regex object.
  */
-const char*
+const char *
 grrDescription(grrNfa nfa);
 
 #endif  // __GRR_ENGINE_NFA_H__

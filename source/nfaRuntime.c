@@ -15,26 +15,26 @@ typedef struct nfaStateRecord {
 } nfaStateRecord;
 
 typedef struct nfaStateSet {
-    nfaStateRecord* records;
+    nfaStateRecord *records;
     unsigned int length;
 } nfaStateSet;
 
 static bool
 determineNextState(unsigned int depth, grrNfa nfa, unsigned int state, char character,
-                   unsigned char* state_set);
+                   unsigned char *state_set);
 
 static bool
-canTransitionToAcceptingState(grrNfa nfa, unsigned int state, unsigned char* visited_states);
+canTransitionToAcceptingState(grrNfa nfa, unsigned int state, unsigned char *visited_states);
 
 static void
-determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord* record,
-                         char character, unsigned char flags, nfaStateSet* set);
+determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord *record,
+                         char character, unsigned char flags, nfaStateSet *set);
 
 static void
-maybePlaceRecord(const nfaStateRecord* record, unsigned int state, nfaStateSet* set, bool update_score);
+maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score);
 
 int
-grrMatch(grrNfa nfa, const char* string, size_t len) {
+grrMatch(grrNfa nfa, const char *string, size_t len) {
     unsigned int state_set_len = (nfa->length + 1 + 7) / 8;  // The +1 is for the accepting state.
     unsigned char current_state_set[state_set_len], next_state_set[state_set_len];
 
@@ -90,7 +90,7 @@ grrMatch(grrNfa nfa, const char* string, size_t len) {
 }
 
 int
-grrSearch(grrNfa nfa, const char* string, size_t len, size_t* start, size_t* end, size_t* cursor,
+grrSearch(grrNfa nfa, const char *string, size_t len, size_t *start, size_t *end, size_t *cursor,
           bool tolerant) {
     unsigned int length;
     size_t champion_score;
@@ -209,8 +209,8 @@ skip_over_clear:
 }
 
 ssize_t
-grrFirstMatch(grrNfa* nfa_list, size_t num, const char* source, size_t size, size_t* processed,
-              size_t* score) {
+grrFirstMatch(grrNfa *nfa_list, size_t num, const char *source, size_t size, size_t *processed,
+              size_t *score) {
     unsigned char flags = GRR_NFA_FIRST_CHAR_FLAG | GRR_NFA_LAST_CHAR_FLAG;
     size_t champion;
     nfaStateSet current_state_sets[num], next_state_sets[num];
@@ -245,7 +245,7 @@ grrFirstMatch(grrNfa* nfa_list, size_t num, const char* source, size_t size, siz
             }
         } else {
             for (size_t k = 0; k < num; k++) {
-                nfaStateSet* current;
+                nfaStateSet *current;
 
                 current = current_state_sets + k;
                 if (current->length == 0) {
@@ -261,7 +261,7 @@ grrFirstMatch(grrNfa* nfa_list, size_t num, const char* source, size_t size, siz
         }
 
         for (size_t k = 0; k < num; k++) {
-            nfaStateSet* next;
+            nfaStateSet *next;
 
             next = next_state_sets + k;
 
@@ -280,7 +280,7 @@ grrFirstMatch(grrNfa* nfa_list, size_t num, const char* source, size_t size, siz
 
     *score = 0;
     for (size_t k = 0; k < num; k++) {
-        nfaStateSet* current;
+        nfaStateSet *current;
 
         current = current_state_sets + k;
 
@@ -299,8 +299,8 @@ grrFirstMatch(grrNfa* nfa_list, size_t num, const char* source, size_t size, siz
 
 static bool
 determineNextState(unsigned int depth, grrNfa nfa, unsigned int state, char character,
-                   unsigned char* state_set) {
-    const nfaNode* nodes;
+                   unsigned char *state_set) {
+    const nfaNode *nodes;
     bool still_alive = false;
 
     if (state == nfa->length) {
@@ -332,8 +332,8 @@ determineNextState(unsigned int depth, grrNfa nfa, unsigned int state, char char
 }
 
 static bool
-canTransitionToAcceptingState(grrNfa nfa, unsigned int state, unsigned char* visited_states) {
-    const nfaNode* nodes;
+canTransitionToAcceptingState(grrNfa nfa, unsigned int state, unsigned char *visited_states) {
+    const nfaNode *nodes;
 
     if (state == nfa->length) {
         return true;
@@ -361,9 +361,9 @@ canTransitionToAcceptingState(grrNfa nfa, unsigned int state, unsigned char* vis
 }
 
 static void
-determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord* record,
-                         char character, unsigned char flags, nfaStateSet* set) {
-    const nfaNode* nodes;
+determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, const nfaStateRecord *record,
+                         char character, unsigned char flags, nfaStateSet *set) {
+    const nfaNode *nodes;
 
     if (state == nfa->length) {
         maybePlaceRecord(record, state, set, (depth > 0));
@@ -375,7 +375,7 @@ determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, con
     nodes = nfa->nodes;
     for (unsigned int k = 0; k <= nodes[state].two_transitions; k++) {
         unsigned int new_state;
-        const unsigned char* symbols;
+        const unsigned char *symbols;
 
         new_state = state + nodes[state].transitions[k].motion;
 
@@ -403,7 +403,7 @@ determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, con
 }
 
 static void
-maybePlaceRecord(const nfaStateRecord* record, unsigned int state, nfaStateSet* set, bool update_score) {
+maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *set, bool update_score) {
     unsigned int k;
     size_t new_score;
 
