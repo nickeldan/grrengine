@@ -1,3 +1,6 @@
+2.0.3:
+    - The '$' wasn't being properly processed by grrSearch.
+
 2.0.2:
     - Parenthetical groups without any disjunction operators are now recognized properly.
     - grrMatch no longer fails when the final character moves the NFA into the accepting state.

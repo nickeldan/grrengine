@@ -35,13 +35,15 @@ maybePlaceRecord(const nfaStateRecord *record, unsigned int state, nfaStateSet *
 
 int
 grrMatch(grrNfa nfa, const char *string, size_t len) {
-    unsigned int state_set_len = (nfa->length + 1 + 7) / 8;  // The +1 is for the accepting state.
-    unsigned char current_state_set[state_set_len], next_state_set[state_set_len];
+    unsigned int state_set_len;
+    unsigned char *current_state_set, *next_state_set;
 
     if (!nfa || !string) {
         return GRR_RET_BAD_ARGS;
     }
-
+    state_set_len = (nfa->length + 1 + 7) / 8;  // The +1 is for the accepting state.
+    current_state_set = alloca(state_set_len);
+    next_state_set = alloca(state_set_len);
     memset(current_state_set, 0, state_set_len);
     SET_FLAG(current_state_set, 0);
 
@@ -161,10 +163,6 @@ skip_over_clear:
             flags |= GRR_NFA_FIRST_CHAR_FLAG;
         } else if (idx == 0) {
             flags |= GRR_NFA_FIRST_CHAR_FLAG;
-        }
-
-        if (idx == len - 1 || !isprint(string[idx + 1])) {
-            flags |= GRR_NFA_LAST_CHAR_FLAG;
         }
 
         character = ADJUST_CHARACTER(character);
@@ -393,7 +391,7 @@ determineNextStateRecord(unsigned int depth, grrNfa nfa, unsigned int state, con
                 continue;
             }
 
-            if (IS_FLAG_SET(symbols, GRR_NFA_LAST_CHAR) && !(flags & GRR_NFA_LAST_CHAR_FLAG)) {
+            if (IS_FLAG_SET(symbols, GRR_NFA_LAST_CHAR)) {
                 continue;
             }
 
